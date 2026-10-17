@@ -4,39 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fffdfa" />
-    <meta name="description" content="一个关于开发、设计与日常思考的个人博客。构建，思考，然后写下来。" />
+    <meta
+      name="description"
+      content="一个关于开发、设计与日常思考的个人博客。构建，思考，然后写下来。"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Devin — 构建，思考，然后写下来。</title>
     <script>
       try {
         let saved;
-        try { saved = localStorage.getItem('blog-theme'); } catch {}
+        try {
+          saved = localStorage.getItem('blog-theme');
+        } catch {}
         const theme = saved === 'morning' ? 'sunrise' : saved;
         const selected = ['dawn', 'sunrise', 'day', 'sunset', 'dusk', 'night'].includes(theme)
-          ? theme : matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+          ? theme
+          : matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'night'
+            : 'day';
         document.documentElement.dataset.theme = selected;
-        document.documentElement.classList.toggle('dark', ['dawn', 'dusk', 'night'].includes(selected));
+        document.documentElement.classList.toggle(
+          'dark',
+          ['dawn', 'dusk', 'night'].includes(selected),
+        );
       } catch {}
     </script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到主要内容</a>
-    <div id="dappled-light" aria-hidden="true">
-      <div id="glow"></div><div id="glow-bounce"></div>
-      <div class="perspective">
-        <div id="leaves">
-          <svg id="wind-animation" width="0" height="0"><defs><filter id="wind" x="-20%" y="-20%" width="140%" height="140%">
-            <feTurbulence type="fractalNoise" numOctaves="2" seed="1" baseFrequency="0.005 0.003"><animate attributeName="baseFrequency" dur="16s" keyTimes="0;0.33;0.66;1" values="0.005 0.003;0.01 0.009;0.008 0.004;0.005 0.003" repeatCount="indefinite" /></feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="45"><animate attributeName="scale" dur="20s" keyTimes="0;0.25;0.5;0.75;1" values="45;55;75;55;45" repeatCount="indefinite" /></feDisplacementMap>
-          </filter></defs></svg>
-        </div>
-        <div id="blinds"><div class="shutters">
-          <div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div><div class="shutter"></div>
-        </div><div class="vertical"><div class="bar"></div><div class="bar"></div></div></div>
-      </div>
-      <div id="progressive-blur"><div></div><div></div><div></div><div></div></div>
-    </div>
+    <div id="ambient-root"></div>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

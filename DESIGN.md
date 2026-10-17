@@ -1,6 +1,6 @@
 # 当前视觉基准
 
-基于 [Tomasz Gil](https://tomaszgil.me/) 的 REA 实测记录实现。用户已明确后续开发沿用当前风格；本文是唯一的视觉规范入口。技术保持 Vite + TypeScript + Tailwind CSS。
+基于 [Tomasz Gil](https://tomaszgil.me/) 的 REA 实测记录实现。用户已明确后续开发沿用当前风格；本文是唯一的视觉规范入口。技术使用 Vite + React + TypeScript + Tailwind CSS，路由使用 React Router。
 
 ## 布局与交互
 
@@ -15,7 +15,8 @@
 
 ## 后续扩展
 
-- 新页面和组件优先复用 `src/style.css` 的内容外框、标题、列表、链接、工具按钮，以及 `src/main.ts` 的共享渲染与导航。
+- 新页面和组件优先复用 `src/styles/` 的内容外框、排版、主题与公共响应式规则，以及 `src/components/`、`src/features/` 中已有组件；`src/app/layout/` 管理共享外框和光影，`src/app/router/` 管理 React Router 路由。
+- 组件与页面按目录组织，通过 `index.tsx` 公开，专有样式就近维护，由 `src/styles/global.css` 统一装配。共享变量与基础样式在前，页面专有规则在后，公共响应式规则最后加载，保持现有视觉覆盖关系。
 - 保持留白、文字层级和细线条表达。新增功能融入当前页面，不恢复旧版居中大标题、卡片堆叠或主题选择面板。
 - 颜色沿用现有主题变量；Geist 400/600 与 Geist Mono 400 保持统一，不为单个页面新增字体或装饰色。
 - 适配 320px 起的窄屏，保留焦点提示、键盘导航、菜单焦点管理及减少动态支持。

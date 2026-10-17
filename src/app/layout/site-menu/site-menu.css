@@ -1,0 +1,147 @@
+.menu-is-open {
+  overflow: hidden;
+}
+.menu-overlay {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 100svh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--ink);
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+}
+.menu-overlay::backdrop {
+  background: transparent;
+}
+.menu-overlay[open] {
+  animation: menu-expand 1s cubic-bezier(0.6, 0, 0.2, 1);
+}
+.menu-layout {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.menu-header,
+.menu-content,
+.menu-footer {
+  animation: menu-content-in 0.3s ease 0.6s both;
+}
+.menu-content {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  padding: 16px 32px;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: end;
+  gap: 32px;
+}
+.menu-grid nav {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.menu-link {
+  display: block;
+}
+.menu-link-title {
+  display: block;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.menu-link:hover .menu-link-title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+.menu-contact h2 {
+  font-size: 28px;
+  line-height: 36px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+.menu-contact p {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.contact-links {
+  column-gap: 24px;
+  row-gap: 12px;
+}
+.contact-links .text-link {
+  font-family: var(--font-mono);
+}
+.menu-footer {
+  padding: 32px;
+}
+.menu-footer > span {
+  display: block;
+}
+.menu-overlay.is-closing {
+  animation: menu-collapse 1s cubic-bezier(0.6, 0, 0.2, 1) 0.15s both;
+}
+.is-closing :is(.menu-header, .menu-content, .menu-footer) {
+  animation: menu-content-out 0.15s ease both;
+}
+@keyframes menu-expand {
+  from {
+    height: 0;
+  }
+  to {
+    height: 100svh;
+  }
+}
+@keyframes menu-collapse {
+  from {
+    height: 100svh;
+  }
+  to {
+    height: 0;
+  }
+}
+@keyframes menu-content-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes menu-content-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (max-width: 767px) {
+  .menu-content {
+    padding: 16px;
+    flex: 1;
+  }
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .menu-overlay {
+    overflow-y: auto;
+  }
+  .menu-layout {
+    min-height: 100svh;
+    gap: 32px;
+  }
+}

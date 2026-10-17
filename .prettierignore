@@ -1,0 +1,7 @@
+node_modules/
+dist/
+public/
+backups/
+package-lock.json
+.agents/
+.impeccable/

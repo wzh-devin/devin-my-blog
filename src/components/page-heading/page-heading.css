@@ -1,0 +1,22 @@
+.page-heading {
+  margin-bottom: 12px;
+}
+.page-heading h1 {
+  font-size: 35px;
+  line-height: 40px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0;
+  animation: title-enter 0.6s ease-out 0.3s both;
+}
+.page-heading > .small-label {
+  animation: title-enter 0.6s ease-out 0.3s both;
+}
+@keyframes title-enter {
+  from {
+    transform: translateY(80px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

@@ -1,10 +1,10 @@
 # Oh, my blog.
 
-用 Vite + TypeScript + Tailwind CSS 实现的个人博客，按 [tomaszgil.me](https://tomaszgil.me/) 的 REA 解析重做：满屏首页、全屏菜单、循环主题、百叶窗与树影光效。
+用 Vite + React + TypeScript + Tailwind CSS 实现的个人博客，使用 React Router 管理路由。视觉参考 [tomaszgil.me](https://tomaszgil.me/) 的 REA 解析：满屏首页、全屏菜单、循环主题、百叶窗与树影光效。
 
 ## 运行
 
-需要 Node.js 22.18+。
+需要 Node.js 22.22+。
 
 ```sh
 npm ci
@@ -12,6 +12,11 @@ npm run dev      # http://127.0.0.1:5173
 npm test         # 路由、筛选、主题和输入边界
 npm run build    # 类型检查 + 生产构建
 npm run preview
+npm run format       # Prettier 格式化
+npm run format:check # 格式检查
+npm run lint         # Oxlint 静态检查
+npm run lint:fix     # 修复支持自动修复的问题
+npm run check        # 格式、静态检查、测试与生产构建
 ```
 
 ## 页面
@@ -28,9 +33,46 @@ npm run preview
 
 ## 修改内容
 
-`src/blog.ts` 保存 profile 和文章列表。修改 introLineList 更换首页两行简介，timeZone 控制时钟（默认 Asia/Shanghai）。署名和文章是示例，文章详情保留示例标记。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
+`src/config/site.ts` 保存 profile。修改 introLineList 更换首页两行简介，timeZone 控制时钟（默认 Asia/Shanghai）。文章内容在 `src/features/articles/data.ts`，类型、分类与筛选在同目录的 `model/index.ts`。署名和文章是示例，文章详情保留示例标记。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
 
-`src/main.ts` 实现页面、菜单、主题与路由；`src/style.css` 管理排版和光影。树影资源来源记录于 `public/ASSETS.md`；字体为自托管的 Geist，不需要运行时远程字体服务。没有复制参考作者的 Logo 或文章。
+树影资源来源记录于 `public/ASSETS.md`；字体为自托管的 Geist，不需要运行时远程字体服务。没有复制参考作者的 Logo 或文章。
+
+## 项目结构
+
+```text
+src/
+├── main.tsx                    # React 与 RouterProvider 入口
+├── app/
+│   ├── app.tsx                 # 根布局、Outlet 与共享状态
+│   ├── router/                 # React Router 配置、文章 loader、页面元数据
+│   ├── keyboard/               # 快捷键，使用 useNavigate 跳转
+│   └── layout/                 # site-header、site-menu、ambient-light
+├── pages/                      # home、about、work、uses、writing、archive、article、not-found
+│   └── archive/
+│       ├── index.tsx
+│       ├── archive.css
+│       └── components/search-toolbar/index.tsx
+├── features/
+│   ├── articles/               # 内容、模型、筛选 Hook、共享文章列表
+│   └── theme/                  # 六主题模型、主题 Hook、切换按钮
+├── components/                 # icon、brand、text-link、page-heading、shortcut-hint
+├── hooks/                      # 跨模块共享的浏览器能力 Hook
+├── config/                     # 网站资料与导航配置
+├── lib/                        # 公共日期格式化
+└── styles/                     # 全局样式入口、主题变量、基础样式及公共响应式规则
+```
+
+组件和页面各自建立目录，以 `index.tsx` 公开；业务模块以 `index.ts` 显式导出。小组件直接在入口实现，复杂模块将内部逻辑放在同目录。模块内部直接引用实现，外部使用公开入口，避免从全局桶文件导入所有组件。
+
+页面专用组件放在页面的 `components/` 中，例如首页时钟与归档搜索栏。跨页面业务组件放在所属 `features/` 中，例如 Writing 与 Archive 共用文章列表。无业务含义的基础组件放在 `src/components/`，新增代码先检查已有实现。
+
+React Router 的 `createBrowserRouter` 集中维护路由，`Outlet` 渲染页面，`Link` 和 `useNavigate` 处理站内跳转，`ScrollRestoration` 恢复历史滚动。导航、菜单编号与快捷键共用 `src/config/navigation.ts`。根布局保留筛选状态，页面切换不会清空条件。React 负责文本转义，避免拼接 HTML。
+
+专有 CSS 与页面或组件就近存放，由 `src/styles/global.css` 统一装配，按“变量、基础、专有、公共响应式”的顺序保持覆盖关系。公共颜色、字体、排版和列表规则仅维护一份。
+
+## 代码约束
+
+Prettier 配置在 `.prettierrc.json`，Oxlint 配置在 `.oxlintrc.json`。Prettier 负责格式，Oxlint 检查 TypeScript、React、Hooks 与可访问性问题；`npm run check` 是交付前检查入口。生成产物、静态资源及本地知识库不参与格式化。
 
 ## 后续开发
 
