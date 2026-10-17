@@ -1,6 +1,6 @@
-# Oh, my blog.
+# devin-my-blog
 
-用 Vite + React + TypeScript + Tailwind CSS 实现的个人博客，使用 React Router 管理路由。视觉参考 [tomaszgil.me](https://tomaszgil.me/) 的 REA 解析：满屏首页、全屏菜单、循环主题、百叶窗与树影光效。
+站点标题为 `devin, my blog.`。用 Vite + React + TypeScript + Tailwind CSS 实现的个人博客，使用 React Router 管理路由。视觉参考 [tomaszgil.me](https://tomaszgil.me/) 的 REA 解析：满屏首页、全屏菜单、循环主题、百叶窗与树影光效。
 
 ## 运行
 
@@ -35,7 +35,7 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 ## 修改内容
 
-`src/config/site.ts` 保存 profile。修改 introLineList 更换首页两行简介，timeZone 控制时钟（默认 Asia/Shanghai）。文章内容在 `src/features/articles/data.ts`，类型、分类与筛选在同目录的 `model/index.ts`。署名和文章是示例，文章详情保留示例标记。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
+`src/config/site.ts` 保存 profile，siteName 统一控制品牌文字与路由标题；首页初始 HTML 标题在 index.html 中同步维护。修改 introLineList 更换首页两行简介，timeZone 控制时钟（默认 Asia/Shanghai）。文章内容在 `src/features/articles/data.ts`，类型、分类与筛选在同目录的 `model/index.ts`。署名和文章是示例，文章详情保留示例标记。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
 
 树影资源来源记录于 `public/ASSETS.md`；字体为自托管的 Geist，不需要运行时远程字体服务。没有复制参考作者的 Logo 或文章。
 

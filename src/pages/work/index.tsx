@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { PageHeading } from '../../components/page-heading/index.tsx';
 import { Icon } from '../../components/icon/index.tsx';
+import { profile } from '../../config/site.ts';
 
 export const WorkPage = () => (
   <main id="main" className="content-page">
@@ -15,7 +16,7 @@ export const WorkPage = () => (
           <li>
             <div className="article-row-heading flex items-baseline justify-between">
               <Link className="article-title" to="/writing/build-a-quiet-blog">
-                Oh, my blog.
+                {profile.siteName}
                 <Icon name="external" />
               </Link>
               <span className="mono muted">2026</span>

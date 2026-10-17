@@ -1,4 +1,4 @@
-# Oh My Blog
+# devin-my-blog
 
 <!-- impeccable:product-schema 1 -->
 
@@ -12,7 +12,7 @@ web
 
 ## Product Purpose
 
-创建参考 https://tomaszgil.me/ 视觉语言的个人博客，可浏览文章并舒适阅读。
+站点标题为 `devin, my blog.`，创建参考 https://tomaszgil.me/ 视觉语言的个人博客，可浏览文章并舒适阅读。
 
 ## Capabilities and Constraints
 

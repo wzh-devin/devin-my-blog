@@ -14,13 +14,13 @@ export const useRouteMetadata = () => {
   const title = page === 'not-found' ? '404' : (article?.title ?? handle.title);
   const previousLocation = useRef(location);
   useLayoutEffect(() => {
-    document.title = `${title} — ${profile.name}`;
+    document.title = page === 'home' ? profile.siteName : `${title} — ${profile.siteName}`;
     document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content =
       article?.description ?? profile.description;
     if (previousLocation.current !== location) {
       document.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
     }
     previousLocation.current = location;
-  }, [location, title, article]);
+  }, [location, page, title, article]);
   return page;
 };

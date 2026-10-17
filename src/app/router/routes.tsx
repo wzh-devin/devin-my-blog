@@ -6,6 +6,7 @@ import {
 } from 'react-router';
 import { App, type AppOutletContext } from '../app.tsx';
 import { navigationList } from '../../config/navigation.ts';
+import { profile } from '../../config/site.ts';
 import { HomePage } from '../../pages/home/index.tsx';
 import { AboutPage } from '../../pages/about/index.tsx';
 import { WorkPage } from '../../pages/work/index.tsx';
@@ -45,7 +46,7 @@ export const routeList: RouteObject[] = [
         Component: pageComponentMap[route],
         handle: {
           page: route,
-          title: route === 'home' ? '构建，思考，然后写下来。' : label,
+          title: route === 'home' ? profile.siteName : label,
         },
       })),
       {
