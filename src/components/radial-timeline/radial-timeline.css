@@ -29,7 +29,7 @@
 }
 .radial-event {
   position: absolute;
-  min-height: 28px;
+  min-height: 44px;
   padding: 2px;
   line-height: 1.35;
   text-align: center;
@@ -39,6 +39,12 @@
 }
 .radial-event span {
   display: block;
+}
+.radial-event-subtitle {
+  margin-top: 3px;
+  color: var(--muted);
+  font: 10px/14px var(--font-mono);
+  white-space: nowrap;
 }
 .radial-event:hover,
 .radial-event[aria-pressed='true'] {

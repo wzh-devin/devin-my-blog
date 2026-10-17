@@ -22,16 +22,31 @@
 }
 .search-field {
   width: 190px;
+  min-height: 32px;
   gap: 8px;
   color: var(--muted);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.search-field:focus-within {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 .search-field input {
+  appearance: none;
   width: 100%;
   min-width: 0;
+  padding: 0;
   background: none;
   border: 0;
+  border-radius: 0;
   font-size: 14px;
   line-height: 28px;
+}
+.search-field input:focus {
+  outline: none;
 }
 .collection-note {
   margin: 24px 0 0;

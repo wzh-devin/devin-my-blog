@@ -1,7 +1,6 @@
 import { profile } from '../../config/site.ts';
 import { TextLink } from '../../components/text-link/index.tsx';
-import { RadialTimeline } from '../../components/radial-timeline/index.tsx';
-import { ArticleList, articleList } from '../../features/articles/index.ts';
+import { ArticleList, ArticleTimeline, articleList } from '../../features/articles/index.ts';
 import { LocalClock } from './components/local-clock/index.tsx';
 
 export const HomePage = () => (
@@ -24,7 +23,7 @@ export const HomePage = () => (
         <ArticleList articleList={articleList.slice(0, 3)} />
       </section>
       <div className="home-timeline">
-        <RadialTimeline>
+        <ArticleTimeline articleList={articleList}>
           <div className="home-clock">
             <div className="small-label">(Local time)</div>
             <div className="location-clock">
@@ -32,7 +31,7 @@ export const HomePage = () => (
               <span>UTC+08:00</span>
             </div>
           </div>
-        </RadialTimeline>
+        </ArticleTimeline>
       </div>
     </div>
   </main>

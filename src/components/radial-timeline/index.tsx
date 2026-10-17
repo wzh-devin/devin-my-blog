@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion';
-import { useId, type ReactNode } from 'react';
+import { useId, useMemo, type ReactNode } from 'react';
 import { Icon } from '../icon/index.tsx';
 import {
   DURATION,
@@ -8,9 +8,11 @@ import {
   TICK_LENGTH_MAJOR,
   TICK_LENGTH_MINOR,
 } from './constants.ts';
-import { timelineEventList, type TimelineEvent } from './data.ts';
-import { getLabelWidth, pointOnCircle, radialDirection } from './math.ts';
+import type { RadialTimelineItem } from './model.ts';
+import { getLabelWidth, pointOnCircle, radialDirection, tickSlotList } from './math.ts';
 import { useRadialTimeline } from './use-radial-timeline.ts';
+
+export type { RadialTimelineItem } from './model.ts';
 
 interface AnimationMotionValues {
   radiusMotionValue: MotionValue<number>;
@@ -23,14 +25,14 @@ interface AnimationMotionValues {
 interface TickLineProps extends AnimationMotionValues {
   slotAngle: number;
   tickLength: number;
-  isEvent: boolean;
+  isHighlighted: boolean;
 }
 
 /** 保留来源逐帧极坐标计算，让圆环展开为弧形时刻度保持径向。 */
 const TickLine = ({
   slotAngle,
   tickLength,
-  isEvent,
+  isHighlighted,
   radiusMotionValue,
   centerYOffsetMotionValue,
   rotationMotionValue,
@@ -66,36 +68,40 @@ const TickLine = ({
       y1={y1}
       x2={x2}
       y2={y2}
-      strokeWidth={isEvent ? 1.25 : 1}
-      opacity={isEvent ? 1 : 0.25}
+      strokeWidth={isHighlighted ? 1.25 : 1}
+      opacity={isHighlighted ? 1 : 0.2}
       className="radial-tick"
     />
   );
 };
 
-interface EventLabelProps extends AnimationMotionValues {
-  event: TimelineEvent;
+interface EventLabelProps<T extends RadialTimelineItem> extends AnimationMotionValues {
+  event: T;
   baseAngle: number;
   scaledTickMajor: number;
   isSelected: boolean;
   detailId: string;
-  onSelect: (event: TimelineEvent, trigger: HTMLButtonElement) => void;
+  onSelect: (event: T, trigger: HTMLButtonElement) => void;
+  onPause: () => void;
+  onResume: () => void;
 }
 
 /** 沿用来源的径向锚点，旋转时标签保持正向且贴合事件长刻度。 */
-const EventLabel = ({
+const EventLabel = <T extends RadialTimelineItem>({
   event,
   baseAngle,
   scaledTickMajor,
   isSelected,
   detailId,
   onSelect,
+  onPause,
+  onResume,
   radiusMotionValue,
   centerYOffsetMotionValue,
   rotationMotionValue,
   viewportCenterX,
   viewportCenterY,
-}: EventLabelProps) => {
+}: EventLabelProps<T>) => {
   const position = useTransform(
     [radiusMotionValue, centerYOffsetMotionValue, rotationMotionValue] as const,
     ([radius, offset, rotation]) => {
@@ -130,45 +136,65 @@ const EventLabel = ({
       type="button"
       className="radial-event"
       data-event-id={event.id}
-      aria-label={`${event.title}, ${event.year}`}
+      aria-label={`${event.title}，${event.subtitle}`}
       aria-pressed={isSelected}
-      aria-controls={detailId}
+      aria-controls={isSelected ? detailId : undefined}
       onClick={(eventClick) => onSelect(event, eventClick.currentTarget)}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== 'touch') onPause();
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType !== 'touch') onResume();
+      }}
       style={{
         left,
         top,
         transform,
         visibility,
         maxWidth: getLabelWidth(viewportCenterX * 2),
-        fontSize: viewportCenterX * 2 >= 480 ? 12 : 9,
+        fontSize: viewportCenterX * 2 >= 480 ? 12 : 10,
       }}
     >
       <span>{event.title}</span>
-      <span>{event.year}</span>
+      <span className="radial-event-subtitle">{event.subtitle}</span>
     </motion.button>
   );
 };
 
-/** 由用户提供的 RadialTimeline 迁移；仅将全屏行为适配为局部容器。 */
-export const RadialTimeline = ({ children }: { children?: ReactNode }) => {
+interface RadialTimelineProps<T extends RadialTimelineItem> {
+  itemList: T[];
+  children: ReactNode;
+  renderDetails: (item: T) => ReactNode;
+}
+
+/** 复用来源的圆环与展开动画，由调用方提供节点和详情。
+ * @template T 时间轴节点及其详情数据。
+ */
+export const RadialTimeline = <T extends RadialTimelineItem>({
+  itemList,
+  children,
+  renderDetails,
+}: RadialTimelineProps<T>) => {
   const {
     elementRef,
     backButtonRef,
     width,
     height,
     baseRadius,
-    geometry,
     arcTop,
     isReducedMotion,
     isExpanded,
     selected,
     handleSelect,
     handleBack,
+    handlePause,
+    handleResume,
     radiusMotionValue,
     centerYOffsetMotionValue,
     rotationMotionValue,
-  } = useRadialTimeline();
+  } = useRadialTimeline<T>();
   const detailId = useId();
+  const itemAngleSet = useMemo(() => new Set(itemList.map((item) => item.angle)), [itemList]);
   const radiusScale = baseRadius / MAX_RADIUS;
   const scaledTickMajor = Math.round(TICK_LENGTH_MAJOR * radiusScale);
   const scaledTickMinor = Math.round(TICK_LENGTH_MINOR * radiusScale);
@@ -183,30 +209,32 @@ export const RadialTimeline = ({ children }: { children?: ReactNode }) => {
     <section
       ref={elementRef}
       className="radial-timeline"
-      aria-label="交互设计时间轴"
+      aria-label="精选文章时间索引"
       data-expanded={isExpanded}
     >
       <svg className="radial-ticks" aria-hidden="true">
-        {geometry.tickSlotList.map(({ angle, event }) => (
+        {tickSlotList.map(({ angle }) => (
           <TickLine
             key={angle}
             slotAngle={angle}
-            tickLength={event ? scaledTickMajor : scaledTickMinor}
-            isEvent={event !== null}
+            tickLength={itemAngleSet.has(angle) ? scaledTickMajor : scaledTickMinor}
+            isHighlighted={itemAngleSet.has(angle)}
             {...animationMotionValues}
           />
         ))}
       </svg>
       <div className="radial-labels">
-        {timelineEventList.map((event) => (
+        {itemList.map((event) => (
           <EventLabel
             key={event.id}
             event={event}
-            baseAngle={geometry.getEventAngle(event)}
+            baseAngle={event.angle}
             scaledTickMajor={scaledTickMajor}
             isSelected={selected?.id === event.id}
             detailId={`${detailId}-${event.id}`}
             onSelect={handleSelect}
+            onPause={handlePause}
+            onResume={handleResume}
             {...animationMotionValues}
           />
         ))}
@@ -226,7 +254,7 @@ export const RadialTimeline = ({ children }: { children?: ReactNode }) => {
             key={selected.id}
             id={`${detailId}-${selected.id}`}
             className="radial-details"
-            aria-label={selected.title}
+            aria-label={selected.detailTitle}
             initial={isReducedMotion ? false : { opacity: 0, filter: 'blur(20px)' }}
             animate={{
               opacity: 1,
@@ -243,7 +271,7 @@ export const RadialTimeline = ({ children }: { children?: ReactNode }) => {
             }}
           >
             <div className="radial-details-header">
-              <h2>{selected.subtitle}</h2>
+              <h2>{selected.detailTitle}</h2>
               <button
                 ref={backButtonRef}
                 type="button"
@@ -255,9 +283,7 @@ export const RadialTimeline = ({ children }: { children?: ReactNode }) => {
                 <span>返回</span>
               </button>
             </div>
-            {selected.body.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+            {renderDetails(selected)}
           </motion.section>
         )}
       </AnimatePresence>

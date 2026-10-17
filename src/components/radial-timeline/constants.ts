@@ -6,4 +6,3 @@ export const TICK_LENGTH_MAJOR = 80;
 export const LABEL_GAP = 10;
 export const DURATION = 0.85;
 export const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
-export const MIN_ANGLE_GAP = 15;

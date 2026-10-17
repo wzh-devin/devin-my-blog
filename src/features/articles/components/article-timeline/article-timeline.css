@@ -1,0 +1,8 @@
+.article-timeline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font: 12px/18px var(--font-mono);
+}

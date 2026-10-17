@@ -21,7 +21,7 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 ## 页面
 
-- `/`：左上简介；桌面左侧最近三篇文章、右侧交互设计时间轴，窄屏依次排列；时区时钟位于圆环中心，展开详情时隐藏，返回时恢复；保留查看全部入口与满屏光影。
+- `/`：左上简介；桌面左侧最近三篇文章、右侧精选文章时间索引，窄屏依次排列；时区时钟位于圆环中心，展开详情时隐藏，返回时恢复；保留查看全部入口与满屏光影。
 - Menu 中的 About、Work、Uses、Writing 对应独立页面。
 - `/writing`：原站式文字入口和最近三篇文章。
 - `/archive`：全部文章、分类、搜索和空结果恢复。
@@ -31,7 +31,7 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 通过可见链接与按钮操作，无全局字母或斜杠快捷键。保留 Tab 导航与 Escape 关闭菜单；菜单由原生 dialog 管理焦点，减少动态偏好会暂停 CSS 与 SVG 风动。
 
-首页时间轴接入用户提供的 Radial Timeline 源码，保留 14 条示例事件、120 刻度和点击展开详情，返回时恢复初始朝向与大小。圆环最大 680px，桌面在顶栏下方的可视区域垂直居中，左侧文章列表的中心与圆心对齐；简介独立位于左上。已按要求移除滚动旋转、循环、吸附与下方说明；滚轮和触摸滑动正常滚动页面。Framer Motion 使用来源版本 12.36.0，减少动态时立即切换。接入范围见 [SOURCE.md](src/components/radial-timeline/SOURCE.md)，事件内容位于同目录 `data.ts`。
+首页时间环复用用户提供的 Radial Timeline 动画，定位为精选文章的时间索引。当前展示四篇代表文章的短标题与年月，按发布日期顺时针排列，以非等距编辑排版保留疏密和留白；角度不表示真实日期间隔。点击节点展开原文标题、日期、分类、阅读时长与摘要，通过“阅读全文”进入正文；返回收回圆环并恢复时钟、焦点与转动。圆心保留时钟，去掉月份统计与年份切换。圆环初始对齐真实秒数，以每秒 6° 匀速顺时针转动，一分钟一圈；标签保持正向、数字时钟固定。悬浮文章标题时暂停，移开后从暂停角度继续；展开预览时暂停，返回通常对齐当前秒数后恢复。触摸不会触发悬浮暂停，减少动态模式保持静止。发布新文章只更新最近文章与 Archive，精选内容需手动调整，不会自动填满圆环。圆环最大 680px，桌面在顶栏下方的可视区域垂直居中，左侧文章列表的中心与圆心对齐；简介独立位于左上。滚轮和触摸滑动正常滚动页面。Framer Motion 使用来源版本 12.36.0，减少动态时立即切换。接入范围见 [SOURCE.md](src/components/radial-timeline/SOURCE.md)。
 
 ## 修改内容
 
@@ -54,7 +54,7 @@ src/
 │       ├── archive.css
 │       └── components/search-toolbar/index.tsx
 ├── features/
-│   ├── articles/               # 内容、模型、筛选 Hook、共享文章列表
+│   ├── articles/               # 内容、模型、筛选 Hook、共享文章列表和精选时间索引
 │   └── theme/                  # 六主题模型、主题 Hook、切换按钮
 ├── components/                 # icon、brand、text-link、page-heading、radial-timeline
 ├── hooks/                      # 跨模块共享的浏览器能力 Hook
@@ -67,7 +67,7 @@ src/
 
 页面专用组件放在页面的 `components/` 中，例如首页时钟与归档搜索栏。跨页面业务组件放在所属 `features/` 中，例如 Home、Writing 与 Archive 共用文章列表。无业务含义的基础组件放在 `src/components/`，新增代码先检查已有实现。
 
-`components/radial-timeline/` 通过 `index.tsx` 公开组件，内部坐标、数据、容器测量和展开动画 Hook 就近维护，复用现有主题变量、Icon 和 useReducedMotion。
+`components/radial-timeline/` 通过 `index.tsx` 公开圆环，节点、圆心内容与详情由调用方传入，内部维护坐标、容器测量与展开动画。精选引用与预览展示位于 `features/articles/components/article-timeline/`，复用 TextLink、日期格式化、主题变量、Icon 和 useReducedMotion。修改该目录 `model.ts` 中的 `curatedArticleList` 更换精选 slug 与短标题，最多六篇；标题、摘要、首次发布日期和阅读时长继续从现有文章数据读取。节点按 `date` 排序，排版位置单独维护，不增加重复正文数据。
 
 React Router 的 `createBrowserRouter` 集中维护路由，`Outlet` 渲染页面，`Link` 处理站内跳转，`ScrollRestoration` 恢复历史滚动。导航和菜单编号共用 `src/config/navigation.ts`。根布局保留筛选状态，页面切换不会清空条件。React 负责文本转义，避免拼接 HTML。
 
