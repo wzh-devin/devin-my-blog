@@ -1,0 +1,84 @@
+.radial-timeline {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--ink);
+}
+.radial-ticks,
+.radial-labels {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.radial-ticks,
+.radial-labels {
+  pointer-events: none;
+}
+.radial-tick {
+  stroke: currentColor;
+}
+.radial-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.radial-event {
+  position: absolute;
+  min-height: 28px;
+  padding: 2px;
+  line-height: 1.35;
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: auto;
+  user-select: none;
+}
+.radial-event span {
+  display: block;
+}
+.radial-event:hover,
+.radial-event[aria-pressed='true'] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.radial-details {
+  position: absolute;
+  z-index: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+.radial-details-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.radial-details h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 400;
+}
+.radial-back {
+  flex-shrink: 0;
+}
+.radial-details p {
+  margin: 0 0 16px;
+}
+@media (max-width: 767px) {
+  .radial-details {
+    padding: 8px;
+  }
+  .radial-details h2 {
+    font-size: 16px;
+    line-height: 22px;
+  }
+}

@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useState } from 'react';
 import { isTheme, nextTheme, themeList, type ThemeId } from './model/index.ts';
 
-/** 单份主题状态同时驱动按钮、快捷键、全局颜色与持久化。 */
+/** 单份主题状态同时驱动按钮、全局颜色与持久化。 */
 export const useTheme = () => {
   const [themeId, setThemeId] = useState<ThemeId>(() => {
     const initial = document.documentElement.dataset.theme;

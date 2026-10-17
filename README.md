@@ -21,15 +21,17 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 ## 页面
 
-- `/`：左上简介、满屏光影、时区时钟和快捷键提示。
+- `/`：左上简介；桌面左侧最近三篇文章、右侧交互设计时间轴，窄屏依次排列；时区时钟位于圆环中心，展开详情时隐藏，返回时恢复；保留查看全部入口与满屏光影。
 - Menu 中的 About、Work、Uses、Writing 对应独立页面。
 - `/writing`：原站式文字入口和最近三篇文章。
 - `/archive`：全部文章、分类、搜索和空结果恢复。
 - `/writing/:slug`：保留原有文章详情路径、目录和代码块。
 
-点击主题按钮或按 T，依次循环 Dawn → Sunrise → Day → Sunset → Dusk → Night。主题会改变颜色与窗影几何，偏好保存在浏览器；旧版 morning 自动迁移为 sunrise。
+点击主题按钮，依次循环 Dawn → Sunrise → Day → Sunset → Dusk → Night。主题会改变颜色与窗影几何，偏好保存在浏览器；旧版 morning 自动迁移为 sunrise。
 
-按 C 显示控件旁的快捷键。H 首页、A 关于、W 项目、U 工具、B Writing、M 菜单、Escape 关闭、/ 搜索。输入状态下不会触发导航。菜单由原生 dialog 管理焦点，减少动态偏好会暂停 CSS 与 SVG 风动。
+通过可见链接与按钮操作，无全局字母或斜杠快捷键。保留 Tab 导航与 Escape 关闭菜单；菜单由原生 dialog 管理焦点，减少动态偏好会暂停 CSS 与 SVG 风动。
+
+首页时间轴接入用户提供的 Radial Timeline 源码，保留 14 条示例事件、120 刻度和点击展开详情，返回时恢复初始朝向与大小。圆环最大 680px，桌面在顶栏下方的可视区域垂直居中，左侧文章列表的中心与圆心对齐；简介独立位于左上。已按要求移除滚动旋转、循环、吸附与下方说明；滚轮和触摸滑动正常滚动页面。Framer Motion 使用来源版本 12.36.0，减少动态时立即切换。接入范围见 [SOURCE.md](src/components/radial-timeline/SOURCE.md)，事件内容位于同目录 `data.ts`。
 
 ## 修改内容
 
@@ -45,7 +47,6 @@ src/
 ├── app/
 │   ├── app.tsx                 # 根布局、Outlet 与共享状态
 │   ├── router/                 # React Router 配置、文章 loader、页面元数据
-│   ├── keyboard/               # 快捷键，使用 useNavigate 跳转
 │   └── layout/                 # site-header、site-menu、ambient-light
 ├── pages/                      # home、about、work、uses、writing、archive、article、not-found
 │   └── archive/
@@ -55,7 +56,7 @@ src/
 ├── features/
 │   ├── articles/               # 内容、模型、筛选 Hook、共享文章列表
 │   └── theme/                  # 六主题模型、主题 Hook、切换按钮
-├── components/                 # icon、brand、text-link、page-heading、shortcut-hint
+├── components/                 # icon、brand、text-link、page-heading、radial-timeline
 ├── hooks/                      # 跨模块共享的浏览器能力 Hook
 ├── config/                     # 网站资料与导航配置
 ├── lib/                        # 公共日期格式化
@@ -64,9 +65,11 @@ src/
 
 组件和页面各自建立目录，以 `index.tsx` 公开；业务模块以 `index.ts` 显式导出。小组件直接在入口实现，复杂模块将内部逻辑放在同目录。模块内部直接引用实现，外部使用公开入口，避免从全局桶文件导入所有组件。
 
-页面专用组件放在页面的 `components/` 中，例如首页时钟与归档搜索栏。跨页面业务组件放在所属 `features/` 中，例如 Writing 与 Archive 共用文章列表。无业务含义的基础组件放在 `src/components/`，新增代码先检查已有实现。
+页面专用组件放在页面的 `components/` 中，例如首页时钟与归档搜索栏。跨页面业务组件放在所属 `features/` 中，例如 Home、Writing 与 Archive 共用文章列表。无业务含义的基础组件放在 `src/components/`，新增代码先检查已有实现。
 
-React Router 的 `createBrowserRouter` 集中维护路由，`Outlet` 渲染页面，`Link` 和 `useNavigate` 处理站内跳转，`ScrollRestoration` 恢复历史滚动。导航、菜单编号与快捷键共用 `src/config/navigation.ts`。根布局保留筛选状态，页面切换不会清空条件。React 负责文本转义，避免拼接 HTML。
+`components/radial-timeline/` 通过 `index.tsx` 公开组件，内部坐标、数据、容器测量和展开动画 Hook 就近维护，复用现有主题变量、Icon 和 useReducedMotion。
+
+React Router 的 `createBrowserRouter` 集中维护路由，`Outlet` 渲染页面，`Link` 处理站内跳转，`ScrollRestoration` 恢复历史滚动。导航和菜单编号共用 `src/config/navigation.ts`。根布局保留筛选状态，页面切换不会清空条件。React 负责文本转义，避免拼接 HTML。
 
 专有 CSS 与页面或组件就近存放，由 `src/styles/global.css` 统一装配，按“变量、基础、专有、公共响应式”的顺序保持覆盖关系。公共颜色、字体、排版和列表规则仅维护一份。
 

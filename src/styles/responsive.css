@@ -3,7 +3,6 @@
   .menu-header {
     padding-inline: 16px;
   }
-  .home-footer,
   .menu-footer {
     padding: 32px 16px;
   }
@@ -16,16 +15,6 @@
   }
   .article-row-heading time {
     text-align: left;
-  }
-  .shortcut-label {
-    right: 0;
-    top: calc(100% + 2px);
-    transform: none;
-    z-index: 1;
-  }
-  .shortcut-right {
-    left: auto;
-    right: 0;
   }
 }
 @media (max-width: 360px) {

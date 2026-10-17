@@ -34,7 +34,6 @@ export const SearchToolbar = ({ search, inputRef }: SearchToolbarProps) => (
         autoComplete="off"
         maxLength={100}
       />
-      <kbd>/</kbd>
     </label>
   </div>
 );

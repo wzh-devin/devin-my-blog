@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import { navigationList } from '../../../config/navigation.ts';
 import { Brand } from '../../../components/brand/index.tsx';
 import { Icon } from '../../../components/icon/index.tsx';
-import { ShortcutHint } from '../../../components/shortcut-hint/index.tsx';
 import { TextLink } from '../../../components/text-link/index.tsx';
 import type { PageId } from '../../router/index.ts';
 import { useSiteMenu } from './use-site-menu.ts';
@@ -31,40 +30,34 @@ export const SiteMenu = ({
       <div className="menu-layout">
         <div className="menu-header flex items-center justify-between">
           <Brand />
-          <span className="shortcut-anchor">
-            <button
-              className="utility-button"
-              type="button"
-              data-action="menu-close"
-              aria-label="关闭菜单"
-              onClick={closeMenu}
-            >
-              <Icon name="close" />
-              <span>Close</span>
-            </button>
-            <ShortcutHint>M</ShortcutHint>
-          </span>
+          <button
+            className="utility-button"
+            type="button"
+            data-action="menu-close"
+            aria-label="关闭菜单"
+            onClick={closeMenu}
+          >
+            <Icon name="close" />
+            <span>Close</span>
+          </button>
         </div>
         <div className="menu-content">
           <div className="menu-grid">
             <nav aria-label="主要导航">
-              {navigationList.map(({ number, label, href, key, route }) => (
-                <div className="shortcut-anchor" key={route}>
-                  <Link
-                    className="menu-link"
-                    to={href}
-                    aria-current={
-                      page === route ||
-                      (route === 'writing' && ['archive', 'article'].includes(page))
-                        ? 'page'
-                        : undefined
-                    }
-                  >
-                    <span className="small-label">({number})</span>
-                    <span className="menu-link-title">{label}</span>
-                  </Link>
-                  <ShortcutHint>{key}</ShortcutHint>
-                </div>
+              {navigationList.map(({ number, label, href, route }) => (
+                <Link
+                  key={route}
+                  className="menu-link"
+                  to={href}
+                  aria-current={
+                    page === route || (route === 'writing' && ['archive', 'article'].includes(page))
+                      ? 'page'
+                      : undefined
+                  }
+                >
+                  <span className="small-label">({number})</span>
+                  <span className="menu-link-title">{label}</span>
+                </Link>
               ))}
             </nav>
             <section className="menu-contact">

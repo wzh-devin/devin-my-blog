@@ -1,8 +1,15 @@
 .home-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  min-height: 720px;
   padding: 16px 32px;
 }
 .home-intro {
+  position: absolute;
+  top: 16px;
+  left: 32px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -20,31 +27,53 @@
 .intro-line:nth-child(2) .intro-text {
   animation-delay: 0.5s;
 }
-.home-footer {
-  gap: 16px;
-  padding: 32px;
+.home-articles {
+  min-width: 0;
+  max-width: 696px;
 }
-.location-clock {
-  gap: 12px;
-  font: 14px/20px var(--font-mono);
+.home-content {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(48px, 6vw, 96px);
+  max-width: 1440px;
+  width: 100%;
+}
+.home-timeline {
+  min-width: 0;
+  width: 100%;
+  max-width: min(680px, calc(100svh - 104px));
+  justify-self: end;
+}
+.home-articles-header {
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.home-articles-header .section-title {
+  margin: 0;
+}
+.home-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
   color: var(--muted);
 }
-.clock-rule {
-  height: 1px;
-  width: 80px;
-  background: var(--line);
+.location-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font: 12px/18px var(--font-mono);
 }
 .local-clock {
   min-width: 100px;
+  font-size: clamp(14px, 1.4vw, 20px);
+  line-height: 1.4;
   font-variant-numeric: tabular-nums;
-}
-.keyboard-description {
-  font: 14px/20px var(--font-mono);
-  color: var(--muted);
-}
-.keyboard-toggle {
-  padding: 0;
-  vertical-align: baseline;
+  color: var(--ink);
 }
 @keyframes intro-enter {
   from {
@@ -52,6 +81,24 @@
   }
   to {
     transform: translateY(0);
+  }
+}
+@media (max-width: 1023px) {
+  .home-main {
+    min-height: 0;
+  }
+  .home-intro {
+    position: static;
+  }
+  .home-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 64px;
+  }
+  .home-timeline {
+    max-width: 680px;
+    justify-self: center;
+    margin-inline: auto;
   }
 }
 @media (max-width: 767px) {
@@ -65,13 +112,7 @@
   .intro-text {
     display: contents;
   }
-  .home-footer {
-    align-items: flex-start;
-  }
-  .location-clock {
-    flex-wrap: wrap;
-  }
-  .clock-rule {
-    width: 60px;
+  .home-content {
+    margin-top: 32px;
   }
 }

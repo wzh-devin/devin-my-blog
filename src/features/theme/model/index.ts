@@ -11,7 +11,7 @@ export type ThemeId = (typeof themeList)[number]['id'];
 export const isTheme = (value: unknown): value is ThemeId =>
   themeList.some((theme) => theme.id === value);
 
-/** 用同一个顺序驱动按钮与 T 快捷键，保证六个时段循环后回到起点。 */
+/** 按固定顺序循环六个时段，末尾回到起点。 */
 export const nextTheme = (theme: ThemeId): ThemeId =>
   themeList[(themeList.findIndex((value) => value.id === theme) + 1) % themeList.length].id;
 

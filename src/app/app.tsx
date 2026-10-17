@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { useArticleSearch } from '../features/articles/index.ts';
 import { useTheme } from '../features/theme/index.ts';
@@ -6,12 +6,9 @@ import { SiteHeader } from './layout/site-header/index.tsx';
 import { SiteMenu, useSiteMenu } from './layout/site-menu/index.tsx';
 import { AmbientLight } from './layout/ambient-light/index.tsx';
 import { useRouteMetadata } from './router/use-route-metadata.ts';
-import { useKeyboardShortcuts } from './keyboard/index.ts';
 
 export type AppOutletContext = {
   search: ReturnType<typeof useArticleSearch>;
-  showShortcuts: boolean;
-  toggleShortcuts: () => void;
 };
 
 /** 根布局保持共享状态，子页面由 React Router Outlet 渲染。 */
@@ -21,18 +18,6 @@ export const App = () => {
   const page = useRouteMetadata();
   const { theme, cycleTheme } = useTheme();
   const search = useArticleSearch();
-  const [showShortcuts, setShowShortcuts] = useState(false);
-  const toggleShortcuts = useCallback(() => setShowShortcuts((value) => !value), []);
-  useKeyboardShortcuts({
-    toggleMenu: menu.toggleMenu,
-    closeMenu: menu.closeMenu,
-    cycleTheme,
-    toggleShortcuts,
-  });
-  useEffect(() => {
-    document.documentElement.classList.toggle('show-shortcuts', showShortcuts);
-    return () => document.documentElement.classList.remove('show-shortcuts');
-  }, [showShortcuts]);
   useEffect(() => {
     const timeout = setTimeout(() => document.body.classList.add('animate'), 500);
     return () => clearTimeout(timeout);
@@ -46,7 +31,7 @@ export const App = () => {
         menuOpen={menu.isOpen}
         onMenuOpen={menu.openMenu}
       />
-      <Outlet context={{ search, showShortcuts, toggleShortcuts } satisfies AppOutletContext} />
+      <Outlet context={{ search } satisfies AppOutletContext} />
       <SiteMenu page={page} menu={menu} />
       <ScrollRestoration />
     </>

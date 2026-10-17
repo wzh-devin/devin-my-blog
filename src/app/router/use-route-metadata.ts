@@ -4,7 +4,7 @@ import { profile } from '../../config/site.ts';
 import type { Article } from '../../features/articles/index.ts';
 import type { RouteHandle } from './types.ts';
 
-/** 路由元数据驱动标题与描述；切页后恢复主标题或搜索输入的焦点。 */
+/** 路由元数据驱动标题与描述，切页后将焦点移至主标题。 */
 export const useRouteMetadata = () => {
   const location = useLocation();
   const match = useMatches().at(-1)!;
@@ -18,8 +18,7 @@ export const useRouteMetadata = () => {
     document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content =
       article?.description ?? profile.description;
     if (previousLocation.current !== location) {
-      const target = location.state?.focusSearch ? '#article-search' : 'h1';
-      document.querySelector<HTMLElement>(target)?.focus({ preventScroll: true });
+      document.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
     }
     previousLocation.current = location;
   }, [location, title, article]);

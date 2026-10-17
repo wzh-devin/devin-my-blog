@@ -38,10 +38,6 @@ export const useSiteMenu = (routeKey: object) => {
   useLayoutEffect(() => () => finishClose(), [finishClose]);
   const openMenu = useCallback(() => setOpenedRouteKey(routeKey), [routeKey]);
   const closeMenu = useCallback(() => setOpenedRouteKey(null), []);
-  const toggleMenu = useCallback(
-    () => setOpenedRouteKey(dialogRef.current?.open ? null : routeKey),
-    [routeKey],
-  );
   /** 接管原生取消，保留菜单的退出动画。 */
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault();
@@ -57,7 +53,6 @@ export const useSiteMenu = (routeKey: object) => {
     isOpen,
     openMenu,
     closeMenu,
-    toggleMenu,
     handleCancel,
     handleAnimationEnd,
   };

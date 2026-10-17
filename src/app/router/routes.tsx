@@ -16,17 +16,13 @@ import { ArticlePage } from '../../pages/article/index.tsx';
 import { NotFoundPage } from '../../pages/not-found/index.tsx';
 import { articleList, type Article } from '../../features/articles/index.ts';
 
-const HomeRoute = () => {
-  const { showShortcuts, toggleShortcuts } = useOutletContext<AppOutletContext>();
-  return <HomePage showShortcuts={showShortcuts} onToggleShortcuts={toggleShortcuts} />;
-};
 const ArchiveRoute = () => <ArchivePage search={useOutletContext<AppOutletContext>().search} />;
 const ArticleRoute = () => {
   const article = useLoaderData<Article | null>();
   return article ? <ArticlePage article={article} /> : <NotFoundPage />;
 };
 const pageComponentMap = {
-  home: HomeRoute,
+  home: HomePage,
   about: AboutPage,
   work: WorkPage,
   uses: UsesPage,
