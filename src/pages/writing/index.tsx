@@ -1,10 +1,11 @@
+import { getNavigationNumber } from '../../config/navigation.ts';
 import { PageHeading } from '../../components/page-heading/index.tsx';
 import { TextLink } from '../../components/text-link/index.tsx';
 import { articleList, ArticleList } from '../../features/articles/index.ts';
 
 export const WritingPage = () => (
   <main id="main" className="content-page">
-    <PageHeading number="05" title="Writing" />
+    <PageHeading number={getNavigationNumber('/writing')} title="Writing" />
     <div className="page-content">
       <div className="intro-copy">
         <p>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { profile } from '../../../../config/site.ts';
 
 /** 时钟独立刷新，离开首页后停止计时，避免重绘整个页面。 */
 export const LocalClock = () => {
@@ -20,7 +19,6 @@ export const LocalClock = () => {
     return () => clearTimeout(timeoutId);
   }, []);
   const label = new Intl.DateTimeFormat('en-US', {
-    timeZone: profile.timeZone,
     hour: 'numeric',
     minute: '2-digit',
     second: '2-digit',

@@ -1,11 +1,13 @@
-import { profile } from '../../config/site.ts';
+import { profile, homeContent } from '../../content/index.ts';
 import { TextLink } from '../../components/text-link/index.tsx';
 import { ArticleList, ArticleTimeline, articleList } from '../../features/articles/index.ts';
 import { LocalClock } from './components/local-clock/index.tsx';
+import { VisitorLocation } from './components/visitor-location/index.tsx';
 
 export const HomePage = () => (
   <main id="main" className="home-main">
-    <h1 className="home-intro" tabIndex={-1}>
+    <h1 className={profile.introLineList.length ? 'home-intro' : 'sr-only'} tabIndex={-1}>
+      {profile.introLineList.length === 0 && profile.siteName}
       {profile.introLineList.map((line, index) => (
         <span className="intro-line" key={index}>
           <span className="intro-text">{line}</span>
@@ -16,19 +18,18 @@ export const HomePage = () => (
       <section className="home-articles" aria-labelledby="home-articles-title">
         <div className="home-articles-header flex items-baseline justify-between">
           <h2 id="home-articles-title" className="section-title">
-            最近文章
+            {homeContent.recentTitle}
           </h2>
-          <TextLink to="/archive">查看全部</TextLink>
+          <TextLink to="/archive">{homeContent.viewAllLabel}</TextLink>
         </div>
         <ArticleList articleList={articleList.slice(0, 3)} />
       </section>
       <div className="home-timeline">
         <ArticleTimeline articleList={articleList}>
           <div className="home-clock">
-            <div className="small-label">(Local time)</div>
             <div className="location-clock">
               <LocalClock />
-              <span>UTC+08:00</span>
+              <VisitorLocation />
             </div>
           </div>
         </ArticleTimeline>

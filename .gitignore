@@ -2,6 +2,8 @@ node_modules/
 dist/
 backups/
 .DS_Store
+.env.local
+.env.*.local
 /.agents/skills/devin-project-context/
 /.impeccable/review/
 *.test.*

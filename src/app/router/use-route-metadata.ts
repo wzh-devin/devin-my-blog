@@ -16,11 +16,11 @@ export const useRouteMetadata = () => {
   useLayoutEffect(() => {
     document.title = page === 'home' ? profile.siteName : `${title} — ${profile.siteName}`;
     document.querySelector<HTMLMetaElement>('meta[name="description"]')!.content =
-      article?.description ?? profile.description;
+      article?.description ?? handle.description ?? profile.description;
     if (previousLocation.current !== location) {
       document.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
     }
     previousLocation.current = location;
-  }, [location, page, title, article]);
+  }, [location, page, title, article, handle.description]);
   return page;
 };

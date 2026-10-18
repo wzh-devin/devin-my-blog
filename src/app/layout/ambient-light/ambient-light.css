@@ -1,4 +1,7 @@
 /* 光影几何与模糊层级来自参考站实测，保留原始投影关系。 */
+#ambient-root {
+  background-color: inherit;
+}
 #dappled-light {
   pointer-events: none;
   width: 100%;
@@ -6,6 +9,9 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
+  background-color: inherit;
+  /* 建立滤镜采样边界，避免四层背景模糊回读整页的滚动绘制。 */
+  will-change: opacity;
 }
 #glow,
 #glow-bounce {

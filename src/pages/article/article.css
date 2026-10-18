@@ -70,6 +70,12 @@
   margin: 16px 0 0;
   padding-left: 18px;
 }
+.table-of-contents ol ol {
+  margin: 0;
+}
+.table-of-contents a {
+  overflow-wrap: anywhere;
+}
 .table-of-contents a:hover {
   text-decoration: underline;
 }
@@ -78,6 +84,78 @@
   line-height: 1.7;
   font-weight: 600;
   margin: 40px 0 16px;
+}
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 32px 0 16px;
+}
+.article-body :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 24px;
+}
+.article-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 24px auto;
+}
+.article-image {
+  margin: 24px 0;
+}
+.article-body .article-image img {
+  margin: 0 auto;
+}
+.article-image figcaption {
+  margin-top: 8px;
+  color: var(--muted);
+  font: 12px/1.6 var(--font-mono);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.article-body :is(ul, ol) {
+  padding-left: 24px;
+  margin: 18px 0;
+  font-size: 16px;
+  line-height: 2;
+}
+.article-body ul {
+  list-style: disc;
+}
+.article-body ol {
+  list-style: decimal;
+}
+.article-body blockquote {
+  border-left: 1px solid var(--line);
+  padding-left: 20px;
+  color: var(--muted);
+}
+.article-body a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.article-body :not(pre) > code {
+  overflow-wrap: anywhere;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: var(--hover);
+  font: 0.85em var(--font-mono);
+}
+.article-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.article-body :is(th, td) {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 16px;
+  text-align: left;
 }
 .article-body p {
   font-size: 16px;
@@ -91,6 +169,91 @@
   background: var(--hover);
   border-radius: 6px;
   font: 12px/2 var(--font-mono);
+}
+.article-code-block {
+  margin: 24px 0;
+  border-radius: 6px;
+  background: var(--hover);
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 8px 16px 0 24px;
+  color: var(--muted);
+  font: 11px/1.5 var(--font-mono);
+}
+.code-language {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.code-copy {
+  flex-shrink: 0;
+  min-width: 64px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+.code-copy:hover,
+.code-copy:focus-visible {
+  background: var(--hover);
+  color: var(--ink);
+}
+.code-copy:disabled {
+  cursor: wait;
+}
+.article-body .article-code-block pre {
+  margin: 0;
+  padding-top: 8px;
+  background: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.article-body .hljs :is(.hljs-keyword, .hljs-title, .hljs-literal, .hljs-selector-tag) {
+  color: var(--ink);
+  font-weight: 600;
+}
+.article-body .hljs :is(.hljs-string, .hljs-number, .hljs-type, .hljs-built_in, .hljs-attr) {
+  color: var(--muted);
+}
+.article-body .hljs :is(.hljs-comment, .hljs-quote, .hljs-meta) {
+  color: var(--muted);
+  font-style: italic;
+}
+.article-diagram {
+  margin: 24px 0;
+  padding-bottom: 24px;
+  border-radius: 6px;
+  background: var(--hover);
+}
+.diagram-canvas {
+  margin: 8px 24px 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.article-body .article-diagram img {
+  max-width: none;
+  height: auto;
+  margin: 0 auto;
+}
+.article-body .diagram-dark {
+  display: none;
+}
+[data-theme='night'] .article-body .diagram-light,
+[data-theme='dawn'] .article-body .diagram-light {
+  display: none;
+}
+[data-theme='night'] .article-body .diagram-dark,
+[data-theme='dawn'] .article-body .diagram-dark {
+  display: block;
+}
+.article-body .diagram-error {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
 }
 .article-end {
   margin-top: 48px;
@@ -109,5 +272,16 @@
   .article-body pre {
     padding: 16px;
     font-size: 11px;
+  }
+  .code-toolbar {
+    padding-right: 8px;
+    padding-left: 16px;
+  }
+  .article-diagram {
+    padding-bottom: 16px;
+  }
+  .diagram-canvas {
+    margin-right: 16px;
+    margin-left: 16px;
   }
 }

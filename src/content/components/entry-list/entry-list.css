@@ -1,0 +1,22 @@
+.entry-row-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+.entry-row-heading h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.entry-actions {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.entry-actions .text-link {
+  min-height: 24px;
+  font-size: 12px;
+  line-height: 20px;
+}

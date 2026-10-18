@@ -48,10 +48,20 @@
 }
 .home-articles-header {
   gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
+  color: var(--muted);
 }
 .home-articles-header .section-title {
   margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.home-articles-header .text-link {
+  min-height: 24px;
+  font-size: 12px;
+  line-height: 20px;
 }
 .home-clock {
   display: flex;
@@ -74,6 +84,11 @@
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
+}
+.visitor-location {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 @keyframes intro-enter {
   from {

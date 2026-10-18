@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
-import { navigationList } from '../../../config/navigation.ts';
+import { Link, useLocation } from 'react-router';
+import { navigationList, menuContent } from '../../../content/index.ts';
 import { Brand } from '../../../components/brand/index.tsx';
 import { Icon } from '../../../components/icon/index.tsx';
 import { TextLink } from '../../../components/text-link/index.tsx';
@@ -17,6 +17,7 @@ export const SiteMenu = ({
   page,
   menu: { dialogRef, handleCancel, handleAnimationEnd, closeMenu },
 }: SiteMenuProps) => {
+  const location = useLocation();
   const [copyrightYear] = useState(() => new Date().getFullYear());
   return (
     <dialog
@@ -46,11 +47,14 @@ export const SiteMenu = ({
             <nav aria-label="主要导航">
               {navigationList.map(({ number, label, href, route }) => (
                 <Link
-                  key={route}
+                  key={href}
                   className="menu-link"
                   to={href}
                   aria-current={
-                    page === route || (route === 'writing' && ['archive', 'article'].includes(page))
+                    page === route ||
+                    page === `page:${route}` ||
+                    location.pathname === href.split(/[?#]/)[0] ||
+                    (route === 'writing' && ['archive', 'article'].includes(page))
                       ? 'page'
                       : undefined
                   }
@@ -61,19 +65,26 @@ export const SiteMenu = ({
               ))}
             </nav>
             <section className="menu-contact">
-              <span className="small-label">(A little hello)</span>
-              <h2>Keep in touch</h2>
-              <p>这个小站记录关于开发、设计与日常的想法。你可以从一篇文字开始，慢慢认识这里。</p>
+              {menuContent.eyebrow && <span className="small-label">({menuContent.eyebrow})</span>}
+              <h2>{menuContent.title}</h2>
+              {menuContent.description && <p>{menuContent.description}</p>}
               <div className="contact-links flex flex-wrap">
-                <TextLink to="/writing">Writing</TextLink>
-                <TextLink to="/about">About</TextLink>
+                {menuContent.linkList.map(({ label, href }, index) => (
+                  <TextLink key={`${href}:${index}`} to={href}>
+                    {label}
+                  </TextLink>
+                ))}
               </div>
             </section>
           </div>
         </div>
         <footer className="menu-footer">
-          <span className="small-label">(Last updated)</span>
-          <span className="mono muted">Copyright / {copyrightYear}</span>
+          {menuContent.footer.label && (
+            <span className="small-label">({menuContent.footer.label})</span>
+          )}
+          <span className="mono muted">
+            {menuContent.footer.text.replaceAll('{year}', String(copyrightYear))}
+          </span>
         </footer>
       </div>
     </dialog>

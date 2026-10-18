@@ -1,3 +1,4 @@
+import { getNavigationNumber } from '../../config/navigation.ts';
 import { useRef } from 'react';
 import { PageHeading } from '../../components/page-heading/index.tsx';
 import { Icon } from '../../components/icon/index.tsx';
@@ -12,7 +13,7 @@ export const ArchivePage = ({ search }: { search: ArticleSearchState }) => {
   };
   return (
     <main id="main" className="content-page archive-page">
-      <PageHeading number="05" title="All articles" />
+      <PageHeading number={getNavigationNumber('/writing')} title="All articles" />
       <div className="page-content">
         <p className="intro-copy">把经历变成文字，把想法留在这里。</p>
         <section aria-label="文章列表">

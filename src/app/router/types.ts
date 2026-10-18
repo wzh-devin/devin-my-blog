@@ -1,4 +1,12 @@
-import type { navigationList } from '../../config/navigation.ts';
-
-export type PageId = (typeof navigationList)[number]['route'] | 'archive' | 'article' | 'not-found';
-export type RouteHandle = { page: PageId; title: string };
+export type PageId =
+  | 'home'
+  | 'about'
+  | 'work'
+  | 'uses'
+  | 'links'
+  | 'writing'
+  | 'archive'
+  | 'article'
+  | 'not-found'
+  | `page:${string}`;
+export type RouteHandle = { page: PageId; title: string; description?: string };

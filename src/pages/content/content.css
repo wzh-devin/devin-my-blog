@@ -1,0 +1,25 @@
+.page-markdown {
+  max-width: 480px;
+}
+.page-markdown .article-body p {
+  line-height: 24px;
+  margin: 0 0 16px;
+}
+.page-markdown .article-body h2 {
+  margin: 48px 0 12px;
+  font-size: 24px;
+  line-height: 30px;
+  letter-spacing: -0.015em;
+}
+.page-markdown .article-body > :first-child {
+  margin-top: 0;
+}
+.page-markdown .article-body > :last-child {
+  margin-bottom: 0;
+}
+.page-markdown > .sample-notice {
+  margin: 24px 0;
+}
+.page-markdown > .page-link-list {
+  margin-top: 24px;
+}
