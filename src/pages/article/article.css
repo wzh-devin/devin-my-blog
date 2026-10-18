@@ -16,13 +16,20 @@
 .detail-meta time {
   font-family: var(--font-mono);
 }
-.article-header h1 {
+.article-header .page-heading {
+  --title-reveal-offset: 100%;
   margin: 24px 0 20px;
+}
+.article-header h1 {
+  margin: 0;
   font-size: 32px;
   line-height: 1.5;
   letter-spacing: -0.025em;
   font-weight: 600;
   text-wrap: balance;
+}
+.article-content {
+  display: block;
 }
 .article-deck {
   color: var(--muted);

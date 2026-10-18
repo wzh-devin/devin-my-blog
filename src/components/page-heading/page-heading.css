@@ -14,7 +14,7 @@
 }
 @keyframes title-enter {
   from {
-    transform: translateY(80px);
+    transform: translateY(var(--title-reveal-offset, 80px));
   }
   to {
     transform: translateY(0);
