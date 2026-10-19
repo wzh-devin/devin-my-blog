@@ -1,5 +1,5 @@
 import { useMemo, type ReactNode } from 'react';
-import type { Article } from '../../model/index.ts';
+import type { ArticleSummary } from '../../model/index.ts';
 import { RadialTimeline } from '../../../../components/radial-timeline/index.tsx';
 import { TextLink } from '../../../../components/text-link/index.tsx';
 import { formatDate } from '../../../../lib/date.ts';
@@ -10,7 +10,7 @@ export const ArticleTimeline = ({
   articleList,
   children,
 }: {
-  articleList: Article[];
+  articleList: ArticleSummary[];
   children: ReactNode;
 }) => {
   const itemList = useMemo(() => createArticleTimelineList(articleList), [articleList]);

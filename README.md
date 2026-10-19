@@ -4,7 +4,7 @@
 
 ## 运行
 
-需要 Node.js 22.22+，并将内容仓库与博客代码放在同一个父目录：
+需要 Node.js 22.22+。本地开发时将内容仓库与网站代码放在同一个父目录：
 
 ```text
 Projects/
@@ -12,13 +12,14 @@ Projects/
 └── devin-blog-content/     # 文章、配图、分类与精选
 ```
 
-内容仓库：[wzh-devin/devin-blog-content](https://github.com/wzh-devin/devin-blog-content)。开发和构建均读取本地文件，不会自动访问 GitHub；在内容仓库中拉取更新后，开发预览会自动刷新。
+内容仓库：[wzh-devin/devin-blog-content](https://github.com/wzh-devin/devin-blog-content)。开发服务和内容导出读取本地文件；网站生产构建不需要内容仓库。浏览器启动时请求 `/content/index.json`，文章和 Markdown 页面正文按路由加载；内容仓库更新不会重新构建网站。开发预览在保存或拉取内容后自动刷新。
 
 ```sh
 npm ci
 npm run dev      # http://127.0.0.1:5173
 npm test         # 路由、筛选、主题和输入边界
-npm run build    # 类型检查 + 生产构建
+npm run build    # 类型检查 + 网站程序构建，不读取文章
+npm run content:build # 校验并导出独立内容到 content-dist/content/
 npm run preview
 npm run format       # Prettier 格式化
 npm run format:check # 格式检查
@@ -43,7 +44,7 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 ## 修改内容
 
-`devin-blog-content/config/site.json` 控制署名、品牌、首页简介和文案；构建会同步初始 HTML 标题与描述。`timeZone` 用于文章日期（示例值 Asia/Shanghai），首页时钟始终跟随访客浏览器当前时区。`src/config/site.ts` 仅保留兼容导出，不再维护内容。下方通过 [GeoJS](https://www.geojs.io/docs/v1/endpoints/geo/) 按 IP 大致识别城市与国家，不请求精确定位、不显示或持久化经纬度；代理可能影响城市。页面内查询一次、5 秒超时，失败显示“位置暂不可用”且时钟正常；切换网络后刷新更新。文章入口在 `src/features/articles/data.ts`，数据由构建时读取独立内容仓库提供；类型和筛选在同目录的 `model/` 中。署名仍为示例，请按实际资料修改。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
+`devin-blog-content/config/site.json` 控制署名、品牌、首页简介和文案；浏览器加载内容后同步页面标题与描述。`timeZone` 用于文章日期（示例值 Asia/Shanghai），首页时钟始终跟随访客浏览器当前时区。`src/config/site.ts` 仅保留兼容导出，不再维护内容。下方通过 [GeoJS](https://www.geojs.io/docs/v1/endpoints/geo/) 按 IP 大致识别城市与国家，不请求精确定位、不显示或持久化经纬度；代理可能影响城市。页面内查询一次、5 秒超时，失败显示“位置暂不可用”且时钟正常；切换网络后刷新更新。文章入口在 `src/features/articles/data.ts`，数据由内容发布流程导出为 JSON，在浏览器运行时读取；类型和筛选在同目录的 `model/` 中。署名仍为示例，请按实际资料修改。未提供真实联系方式，因此没有生成虚构邮箱或社交账号。
 
 ### 内容目录与发布位置
 
@@ -70,13 +71,13 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 文章按发布日期降序展示，首页和 Writing 取最近三篇。圆环清单只引用已发布文章，最多六篇；移除精选不会删除文章。阅读时长按正文字符数估算。移回草稿前，先删除对应精选引用。
 
-无效 JSON/YAML、重复文章标识、错误日期、未登记分类、失效精选和越界或缺失配图会明确报错并阻止构建；不会回退到旧示例数据。没有已发布文章时允许空列表。
+无效 JSON/YAML、重复文章标识、错误日期、未登记分类、失效精选和越界或缺失配图会明确报错并阻止内容发布；不会回退到旧示例数据。没有已发布文章时允许空列表。
 
 正文的 `##`、`###` 等标题会自动进入“本文目录”，按实际标题层级嵌套缩进，点击后定位到对应标题；跳级时归入最近的上级标题，不补造空章节。
 
 ### 站点配置和独立页面
 
-配置模板见下方“内容仓库初始化模板”，详细目录与字段说明见 [内容仓库 README](https://github.com/wzh-devin/devin-blog-content/blob/main/README.md)。网站只读取内容仓库中的 `config/` 与 `pages/`，不内置另一份配置，也不在运行时解析 README。站点、导航、菜单和内置页面文件必须存在；缺少必要文件或字段会指出位置并阻止启动/构建。
+配置模板见下方“内容仓库初始化模板”，详细目录与字段说明见 [内容仓库 README](https://github.com/wzh-devin/devin-blog-content/blob/main/README.md)。网站只读取内容仓库中的 `config/` 与 `pages/`，不内置另一份配置，也不在运行时解析 README。站点、导航、菜单和内置页面文件必须存在；缺少必要文件或字段会阻止内容导出并指出位置；浏览器请求失败显示重试入口，不使用内置示例。
 
 允许显式清空：`navigation.json` 为 `[]` 隐藏全部菜单，`sectionList: []` 清空页面分组，`entryList: []` 清空分组条目，`linkList: []` 清空操作链接。条目的 `year`、`linkList` 和 Markdown 的 `description`、`notice`、`linkList` 是可选字段；其余以模板及校验提示为准。
 
@@ -84,11 +85,11 @@ npm run check        # 格式、静态检查、测试与生产构建
 
 About 与自定义页面使用 Markdown，图片放在自身目录中；Work/Uses/Links 共用 JSON 列表模板。每个条目支持可选 `linkList: [{ label, href }]`，可同时展示官网、下载等多个链接，支持安装包直链；省略或 `[]` 保持纯名称和描述。Markdown 正文里的相对页面/文章链接会自动映射网站路径；配置中的链接使用 `/about` 等站内绝对路径或 HTTP(S)、mailto、tel。系统路径 `/`、`/writing`、`/archive`、`/writing/:slug` 和资源目录不能被自定义页面占用；`about`、`work`、`uses`、`links` 分别使用规定格式。
 
-无效配置、未知字段、危险链接、失效站内配置链接、页面冲突会包含文件位置并阻断构建。保存/新增/删除配置、页面和配图后，开发服务自动刷新；线上仍需重新构建部署。
+无效配置、未知字段、危险链接、失效站内配置链接、页面冲突会包含文件位置并阻断内容导出。保存/新增/删除配置、页面和配图后，开发服务自动刷新；线上由内容仓库工作流独立发布，刷新页面后读取最新索引。
 
 ### 代码高亮与 Mermaid 图表
 
-正文继续使用 `markdown-to-jsx`。`highlight.js` 和 `beautiful-mermaid` 仅在构建端运行，不进入浏览器 JavaScript；无需 CDN 或在线图表服务。
+正文继续使用 `markdown-to-jsx`。`highlight.js` 和 `beautiful-mermaid` 仅在内容导出端运行，不进入浏览器 JavaScript；无需 CDN 或在线图表服务。
 
 代码围栏标明语言即可高亮，例如 `typescript`、`ts`、`javascript`、`json`、`bash`、`go`、`python`、`sql` 等 common 构建支持的语言；无语言或未知语言保持纯文本。代码块右上角显示语言名（未标记时为 `text`）和“复制”按钮，复制原文并保留缩进与换行；成功显示“已复制”，失败可重试。复制使用浏览器 Clipboard API，需要 HTTPS 或 localhost。代码块沿用网站现有字体、背景、间距和主题色。
 
@@ -114,7 +115,7 @@ Work、Uses、Links 的 JSON 结构完全相同：`{ title, introduction, sectio
 BLOG_CONTENT_DIR=/absolute/path/to/devin-blog-content
 ```
 
-相对路径以博客代码仓库根目录为基准。这个变量仅用于构建，不进入浏览器；修改目录设置后重启开发服务。生产构建同样要求该目录存在，图片会随 `dist` 输出，线上不需要保留内容仓库或 GitHub 凭据。
+相对路径以博客代码仓库根目录为基准。这个变量用于开发和 `content:build`，不进入浏览器；修改后重启开发服务。网站生产构建不要求该目录存在，文章和配图仅输出到 `content-dist/`，不会进入 `dist/` 或网站镜像。线上只保留生成文件，不保存源码仓库或 GitHub 凭据。
 
 树影资源来源记录于 `public/ASSETS.md`；字体为自托管的 Geist，不需要运行时远程字体服务。没有复制参考作者的 Logo 或文章。
 
@@ -378,7 +379,7 @@ src/
 │   └── theme/                  # 六主题模型、主题 Hook、切换按钮
 ├── components/                 # icon、brand、text-link、page-heading、radial-timeline
 ├── hooks/                      # 跨模块共享的浏览器能力 Hook
-├── content/                    # 编译内容入口与共享 Markdown / 列表组件
+├── content/                    # 运行时内容入口与共享 Markdown / 列表组件
 ├── config/                     # 网站资料与导航兼容入口
 ├── lib/                        # 公共日期格式化
 └── styles/                     # 全局样式入口、主题变量、基础样式及公共响应式规则
@@ -404,75 +405,84 @@ Prettier 配置在 `.prettierrc.json`，Oxlint 配置在 `.oxlintrc.json`。Pret
 
 旧版备份、截图、检查脚本和设计记录已清理，当前光影资源、REA 参考证据及当前版本检查保留。项目内不再提供旧版归档恢复。
 
-## GitHub Actions 与服务器发布
+## Docker Compose 与独立发布
 
-网站工作流位于 [.github/workflows/deploy.yml](.github/workflows/deploy.yml)，文章触发工作流位于内容仓库的 `.github/workflows/notify-site.yml`。两个仓库的远端默认分支均为 `main`。网站 `main` 推送会构建并发布；内容仓库 `main` 的 `posts/`、`pages/`、`config/` 变化会通知网站构建，并锁定本次文章提交的 SHA。仅修改 `drafts/` 或 README 不触发文章发布。
+网站与内容分别发布：
 
-手动进入网站 Actions → **Build and deploy blog** → **Run workflow**：默认 `deploy=false`，只构建并保存 `blog-dist` 产物，不连接服务器。手动检查构建后，再次运行并勾选 `deploy` 才执行该次手动发布；`main` 推送和文章通知本身会请求自动发布。`content_sha` 可留空以读取配置分支，也可填完整的 40 位内容提交 SHA。发布串行执行，不在上传中途取消前一轮。
+| 仓库               | main 推送时执行                            | 服务器变化                            |
+| ------------------ | ------------------------------------------ | ------------------------------------- |
+| devin-my-blog      | 检查并构建网站程序，打包 Docker 镜像       | Compose 更新网站容器；保留内容目录    |
+| devin-blog-content | 校验文章、配置、页面，生成 JSON 与摘要资源 | 只更新 content/；不构建网站或重启容器 |
 
-### 网站仓库配置
+网站工作流为 [.github/workflows/deploy.yml](.github/workflows/deploy.yml)。内容工作流为内容仓库的 `.github/workflows/publish.yml`。手动运行默认 `deploy=false`，只生成产物；明确勾选才发布。内容发布不触发网站工作流，不需要 `CONTENT_READ_TOKEN` 或 `SITE_DISPATCH_TOKEN`。
 
-打开网站仓库 **Settings → Secrets and variables → Actions**。以下 Variables 在 [Repository variables](https://github.com/wzh-devin/devin-my-blog/settings/variables/actions) 中设置：
+### 源码、镜像与内容目录
 
-| 名称                 | 值或说明                                                                         |
-| -------------------- | -------------------------------------------------------------------------------- |
-| `CONTENT_REPOSITORY` | `wzh-devin/devin-blog-content`                                                   |
-| `CONTENT_BRANCH`     | `main`                                                                           |
-| `DEPLOY_HOST`        | 服务器 IP 或域名，IPv6 不加方括号                                                |
-| `DEPLOY_PORT`        | SSH 端口；不填时为 `22`                                                          |
-| `DEPLOY_USER`        | 服务器上的部署用户，例如 `deploy`                                                |
-| `DEPLOY_PATH`        | 专用于此站点的绝对目录，例如 `/var/www/devin-blog`；不支持空格、路径回退或根目录 |
-| `DEPLOY_KNOWN_HOSTS` | 已核对的服务器 SSH 主机公钥记录，允许多行；非 22 端口的记录需使用 `[主机]:端口`  |
+借鉴 [Hexo 的目录职责](https://hexo.io/zh-cn/docs/setup.html)：配置、写作源文件、主题程序与生成产物分别维护。本项目保留既有内容仓库 `config/、posts/、pages/、drafts/`，生成的 JSON、SVG 与配图才会公开；源码、草稿、SSH 凭据不会直接上传。
 
-以下内容放在 [Repository secrets](https://github.com/wzh-devin/devin-my-blog/settings/secrets/actions)：
+网站程序与 [静态服务配置](deploy/nginx.conf) 放在 [Docker 镜像](Dockerfile) 内，服务器通过 [compose.yaml](compose.yaml) 管理：
 
-| 名称                 | 值或说明                                                                                            |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| `DEPLOY_SSH_KEY`     | 部署专用 SSH 私钥完整内容；对应公钥放在部署用户的 `~/.ssh/authorized_keys`                          |
-| `CONTENT_READ_TOKEN` | 内容仓库为私有时必填；fine-grained PAT 仅授权该内容仓库 **Contents: Read-only**。公开内容仓库可不填 |
-
-`BLOG_CONTENT_DIR` 在工作流内部固定为 `./content`，与 checkout 目录对应，不需要额外配置仓库变量。GitHub Token 和 SSH 私钥不进入前端变量或网站产物。
-
-服务器应安装 `rsync`，允许该用户通过 SSH 登录并写入 `DEPLOY_PATH`。使用部署专用目录；脚本不申请 sudo、不修改 Nginx、不安装服务。主机公钥可先通过 `ssh-keyscan -p 端口 主机` 获取，再与服务器自身的公钥指纹独立核对后填写；发布时启用 `StrictHostKeyChecking=yes`，不会自动接受未知主机。
-
-### 内容仓库配置
-
-在 `devin-blog-content` 的 **Settings → Secrets and variables → Actions** 中设置：
-
-| 类型      | 名称                  | 值或说明                                                                                   |
-| --------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| Variables | `WEBSITE_REPOSITORY`  | `wzh-devin/devin-my-blog`                                                                  |
-| Variables | `WEBSITE_REF`         | `main`，必须已有网站的 `deploy.yml` 工作流                                                 |
-| Secrets   | `SITE_DISPATCH_TOKEN` | fine-grained PAT，仅授权网站仓库 **Actions: Read and write**，用于请求 `workflow_dispatch` |
-
-读取文章和触发发布使用两个独立 Token：`CONTENT_READ_TOKEN` 只读内容仓库，`SITE_DISPATCH_TOKEN` 只触发网站仓库 Actions。默认 `GITHUB_TOKEN` 不提供其他私有仓库的访问权限。权限依据：[checkout 文档](https://github.com/actions/checkout#checkout-multiple-repos-private)、[workflow dispatch API](https://docs.github.com/en/rest/actions/workflows#create-a-workflow-dispatch-event)。
-
-### 第一次启用
-
-1. 确保两个仓库的完整内容接入代码、`config/`、`pages/`、工作流和网站 `.github/scripts/deploy.sh` 已进入各自的 `main`。网站开发分支为 `dev`，需审查合并到 `main`；本地保存或推送其他分支不会自动发布。
-2. 在 GitHub 填入上面的 Variables/Secrets，准备服务器部署用户、目录和 `rsync`。
-3. 网站 Actions 手动运行一次，保持 `deploy=false`，检查 `blog-dist` 产物中的文章和配置。
-4. 确认后勾选 `deploy` 手动发布一次；之后两个仓库的指定推送会自动触发。也可以手动运行内容仓库的 **Notify website deployment**。
-
-构建复用 Node.js 22.22.0、`npm ci`、Prettier、Oxlint、类型检查及内容校验。先检查网站代码，再 checkout 内容，避免将文章仓库的排版格式强加给网站检查。现有 `.gitignore` 排除了 `tests/` 和 `*.test.*`，因此 CI 不执行未随 Git 上传的本地测试；本地交付仍使用完整 `npm run check`。第一方 Actions 固定为核对过的完整 commit SHA。
-
-### 发布行为与 Nginx
-
-发布先上传资源，完成后将 `index.html` 上传到临时文件并原子替换入口；资源上传失败时不替换原页面。SSH 临时私钥文件权限为 600，结束后删除。脚本不使用 rsync `--delete`，保留旧摘要资源，让已打开页面仍能读取旧代码块；远端历史资源会累积，需要在实际容量成为问题时安排清理。
-
-Nginx 在现有站点配置中指向 `DEPLOY_PATH`，并设置 React Router 的 SPA 回退：
-
-```nginx
-root /var/www/devin-blog;
-index index.html;
-
-location / {
-    try_files $uri $uri/ /index.html;
-}
+```text
+/root/devin-my-blog/
+├── compose.yaml         # 网站发布时更新
+├── .env                 # 镜像版本与端口绑定，无密码/Token
+└── content/             # 内容发布时更新，容器只读挂载到 /srv/content
+    ├── index.json       # 最新配置、元数据、正文地址；no-store
+    ├── documents/       # 摘要命名的正文 JSON；按路由加载
+    └── ...              # 摘要命名的图片与图表
 ```
 
-启用前需由有权限的账号在 GitHub 网页填写变量和密钥，并完成首次构建与发布验收。工作流不会代为配置服务器账号、目录权限或 Nginx。
+`content/index.json` 使用 `schemaVersion: 1`。每次打开或刷新网站读取新索引；已打开页面使用当前快照，刷新后获取更新。正文按内容摘要命名，可以长期缓存；更新或下架后旧摘要文件仍保留，避免已打开页面读不到正文。下架不提供对公开旧文件的保密撤回能力。
 
-## 部署边界
+Nginx Proxy Manager 继续负责域名与 HTTPS，代理到独立静态容器；无需改动现有 NPM 的 Compose 或其他站点。现有域名为 `blog.devin.wang`，NPM 转发到博客容器端口。服务器 `.env` 保留绑定地址与端口，下面是仅供本机访问的示例：
 
-网站为静态产物，没有后端、登录、在线编辑和评论。面向搜索/社交抓取的 HTML 预渲染仍未实现；静态目录和 SPA 回退由服务器维护。线上可访问性需在配置并运行真实发布后确认。
+```dotenv
+BLOG_BIND_ADDRESS=127.0.0.1
+BLOG_HTTP_PORT=16001
+BLOG_IMAGE=devin-my-blog:v0.1.1 # 由网站发布脚本写入，与 package.json 版本一致
+```
+
+默认只监听回环地址；NPM 在容器中运行时，应填写 NPM 能访问的主机私网地址，与已有上游规则保持一致。实际连接参数存 GitHub Variables 和服务器环境文件。不要直接把 /root 目录开放给部署用户；上传和 Docker 操作使用既有 `sudo -n` 权限。静态容器只挂载本项目内容目录。
+
+### 两个仓库的 GitHub 配置
+
+分别打开两个仓库的 **Settings → Secrets and variables → Actions**，填写相同的服务器 Variables：
+
+| 名称               | 此项目设置                                                  |
+| ------------------ | ----------------------------------------------------------- |
+| DEPLOY_HOST        | 服务器 SSH IP 或域名                                        |
+| DEPLOY_PORT        | 22                                                          |
+| DEPLOY_USER        | ubuntu                                                      |
+| DEPLOY_PATH        | /root/devin-my-blog                                         |
+| DEPLOY_KNOWN_HOSTS | 已独立核对的 SSH 主机公钥记录；非默认端口使用 `[主机]:端口` |
+
+两个仓库各配置 Secret `DEPLOY_SSH_KEY`：部署密钥的完整私钥；只存 GitHub Secrets，不进入文章、前端环境变量或产物。用户名、主机与目录为可见配置，密码不参与部署。
+
+内容仓库另外保留 Variables：
+
+| 名称               | 值                      |
+| ------------------ | ----------------------- |
+| WEBSITE_REPOSITORY | wzh-devin/devin-my-blog |
+| WEBSITE_REF        | main                    |
+
+这两个变量只用于取得公开网站仓库中的内容解析器与发布脚本，不触发网站发布。构建记录锁定取得的处理器提交，发布阶段使用同一提交的脚本。私有内容仓库用自身的 `GITHUB_TOKEN` 读取自身；不需授权其他私有仓库。
+
+### 首次启用与手动验收
+
+1. 审查网站与内容仓库的完整改动；网站开发分支为 dev，启用需经审查合并到 main。不要只上传工作流而遗漏解析器、运行时读取、Dockerfile 和 Compose。
+2. 配置上面的 Variables/Secret。服务器需已有 Docker、Compose、rsync、经确认的 SSH 主机身份，以及部署账号的既有非交互 sudo 权限。
+3. 内容 Actions **Publish blog content** 默认只生成 `blog-content` 产物；确认后勾选 deploy 发布首份内容。
+4. 网站 Actions **Build and deploy website** 默认只生成 `blog-website-image`；确认后勾选 deploy。镜像由 runner 构建后打包上传，服务器只加载镜像并运行 Compose，不在小内存服务器安装 Node 或执行 npm 构建。
+5. 检查首页、文章直达、代码复制、图表和 `/content/index.json` 缓存头。以后文章/配置变化只推送内容仓库；前端代码变化只推送网站仓库。
+
+镜像标签统一使用 `vX.Y.Z`，唯一版本来源为 `package.json` 的 `version`，例如 `0.1.1` 对应 `devin-my-blog:v0.1.1`。每次网站发版先递增版本（例如 `npm version patch --no-git-tag-version`，同时更新 package-lock.json），再提交网站代码；该命令不会创建 Git 提交或 Git 标签。构建和部署都会校验格式，拒绝日期、提交 SHA、latest、预发布后缀及多余前导零。镜像的 `org.opencontainers.image.revision` 标签记录 Actions 构建的提交 SHA，用于核对实际部署来源。文章和配置更新不需要改网站版本。
+
+网站 Dockerfile 使用预先生成的 dist：本地先 `npm run build`，再 `docker build -t "devin-my-blog:v$(node -p "require('./package.json').version")" .`。本地开发或预览直接使用 npm 命令；生产只由 Compose 运行镜像。
+
+### 发布保障和边界
+
+网站上传到本项目临时目录，加载镜像并校验 Nginx/Compose，使用健康检查启动后切换版本配置；启动失败时尝试恢复上一版 Compose 和镜像。镜像内负责 SPA 地址回退；图片/正文缺失返回真实 404。内容发布先上传摘要文件，最后原子切换索引；上传失败不替换旧索引。SSH 严格校验主机身份，临时私钥权限 600，结束删除；rsync 不使用 --delete。旧镜像与内容摘要文件按实际磁盘容量需要另行清理。
+
+网站没有数据库、登录、在线编辑或评论。正文使用安全 AST；代码高亮和图表在内容发布时生成，不把构建引擎带入浏览器。HTML 初始元数据仍为网站外壳，内容加载后更新，面向爬虫的预渲染尚未实现。
+
+本地测试沿用现有 Git 忽略策略：tests/ 和 _.test._ 不随 Git 上传，所以 CI 运行格式、Oxlint、类型与构建/内容校验；本地完整验收使用 npm run check。用户审查与提交授权、GitHub 实际运行和服务器验收的状态以本次交付为准。

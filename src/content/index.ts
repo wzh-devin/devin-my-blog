@@ -1,4 +1,6 @@
-export {
+import { getPublishedContent } from './model/index.ts';
+
+export const {
   profile,
   homeContent,
   menuContent,
@@ -7,5 +9,5 @@ export {
   workContent,
   usesContent,
   linksContent,
-} from 'virtual:blog-content';
-export type { MarkdownPage, ListPageContent } from './types.ts';
+} = getPublishedContent();
+export type { MarkdownPage, ListPageContent, PageReference } from './types.ts';

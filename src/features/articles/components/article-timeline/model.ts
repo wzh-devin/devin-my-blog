@@ -1,9 +1,9 @@
-import type { Article } from '../../model/index.ts';
+import type { ArticleSummary } from '../../model/index.ts';
 import { featuredArticleList } from '../../data.ts';
 import type { RadialTimelineItem } from '../../../../components/radial-timeline/index.tsx';
 
 export interface ArticleTimelineItem extends RadialTimelineItem {
-  article: Article;
+  article: ArticleSummary;
 }
 
 // 编辑排版保留一段无标签的弧线；角度不表示日期间距，最多展示六篇精选。
@@ -13,7 +13,9 @@ const curatedAngleList = [0, 54, 156, 237, 282, 321];
  * @param articleList 已发布文章，日期格式为 YYYY-MM-DD。
  * @returns 复用文章内容、采用非等距排版的精选节点。
  */
-export const createArticleTimelineList = (articleList: readonly Article[]): ArticleTimelineItem[] =>
+export const createArticleTimelineList = (
+  articleList: readonly ArticleSummary[],
+): ArticleTimelineItem[] =>
   featuredArticleList
     .flatMap(({ slug, shortTitle }) => {
       const article = articleList.find((article) => article.slug === slug);

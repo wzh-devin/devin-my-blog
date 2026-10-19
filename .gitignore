@@ -1,5 +1,7 @@
 node_modules/
 dist/
+content-dist/
+deployment/
 backups/
 .DS_Store
 .env.local

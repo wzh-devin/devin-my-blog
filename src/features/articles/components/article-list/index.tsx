@@ -1,9 +1,9 @@
 import { Link } from 'react-router';
-import type { Article } from '../../model/index.ts';
+import type { ArticleSummary } from '../../model/index.ts';
 import { Icon } from '../../../../components/icon/index.tsx';
 import { formatDate } from '../../../../lib/date.ts';
 
-export const ArticleList = ({ articleList }: { articleList: Article[] }) => (
+export const ArticleList = ({ articleList }: { articleList: ArticleSummary[] }) => (
   <ul className="article-list">
     {articleList.map((article) => (
       <li key={article.slug}>

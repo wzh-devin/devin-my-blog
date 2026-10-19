@@ -1,13 +1,14 @@
 {
   "name": "devin-my-blog",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "build": "npm run typecheck && vite build",
+    "content:build": "node --env-file-if-exists=.env.local --experimental-strip-types build/content-cli.ts",
     "preview": "vite preview --host 127.0.0.1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

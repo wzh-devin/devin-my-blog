@@ -1,4 +1,4 @@
-import type { Article } from '../features/articles/model/types.ts';
+import type { Article, ArticleSummary, BlogContent } from '../features/articles/model/types.ts';
 
 export type ContentLink = { label: string; href: string };
 export type NavigationItem = ContentLink & { number: string; route: string };
@@ -42,3 +42,11 @@ export type SiteContent = {
   usesContent: ListPageContent;
   linksContent: ListPageContent;
 };
+
+export type DocumentReference = { slug: string; bodyUrl: string };
+export type PageReference = Omit<MarkdownPage, 'nodeList'> & DocumentReference;
+export type PublishedContent = Omit<BlogContent, 'articleList' | 'pageList'> & {
+  articleList: (ArticleSummary & DocumentReference)[];
+  pageList: PageReference[];
+};
+export type ContentIndex = { schemaVersion: 1; content: PublishedContent };

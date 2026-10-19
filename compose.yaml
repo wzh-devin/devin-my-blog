@@ -1,0 +1,11 @@
+name: devin-my-blog
+
+services:
+  web:
+    image: ${BLOG_IMAGE:?Set BLOG_IMAGE to devin-my-blog:vX.Y.Z}
+    container_name: devin-my-blog-static
+    restart: unless-stopped
+    ports:
+      - '${BLOG_BIND_ADDRESS:-127.0.0.1}:${BLOG_HTTP_PORT:-16001}:80'
+    volumes:
+      - ./content:/srv/content:ro

@@ -12,6 +12,8 @@ import {
   linksContent,
   type MarkdownPage,
 } from '../../content/index.ts';
+import { loadDocument } from '../../content/model/index.ts';
+import { ContentLoadError } from '../../content/components/content-load-error/index.tsx';
 import { profile } from '../../config/site.ts';
 import { HomePage } from '../../pages/home/index.tsx';
 import { WorkPage } from '../../pages/work/index.tsx';
@@ -33,9 +35,9 @@ const loadArticleRoute = async () => {
   return { Component: ArticleRoute };
 };
 /** 独立 Markdown 页同样按需加载，首页不承担正文渲染器体积。 */
-const loadContentRoute = async (page: MarkdownPage) => {
+const loadContentRoute = async () => {
   const { ContentPage } = await import('../../pages/content/index.tsx');
-  return { Component: () => <ContentPage page={page} /> };
+  return { Component: () => <ContentPage page={useLoaderData<MarkdownPage>()} /> };
 };
 const aboutPage = pageList.find((page) => page.slug === 'about')!;
 const systemPageList = [
@@ -47,14 +49,17 @@ const systemPageList = [
 ];
 
 /** 文章标识由 React Router 解码，缺失文章使用同一套 404 页面。 */
-const loadArticle = ({ params }: LoaderFunctionArgs) =>
-  articleList.find((article) => article.slug === params.slug) ?? null;
+const loadArticle = ({ params, request }: LoaderFunctionArgs) => {
+  const article = articleList.find((entry) => entry.slug === params.slug);
+  return article ? loadDocument<Article>(article, request.signal) : null;
+};
 
 export const routeList: RouteObject[] = [
   {
     id: 'root',
     path: '/',
     Component: App,
+    ErrorBoundary: ContentLoadError,
     // 首屏路由加载期间保留背景，正文仍由原有入场动画展示。
     HydrateFallback: () => null,
     children: [
@@ -67,6 +72,7 @@ export const routeList: RouteObject[] = [
       {
         id: 'about',
         path: 'about',
+        loader: ({ request }) => loadDocument<MarkdownPage>(aboutPage, request.signal),
         lazy: async () => ({ Component: (await import('../../pages/about/index.tsx')).AboutPage }),
         handle: { page: 'about', title: aboutPage.title, description: aboutPage.description },
       },
@@ -75,7 +81,9 @@ export const routeList: RouteObject[] = [
         .map((page) => ({
           id: `page:${page.slug}`,
           path: page.slug,
-          lazy: () => loadContentRoute(page),
+          loader: ({ request }: LoaderFunctionArgs) =>
+            loadDocument<MarkdownPage>(page, request.signal),
+          lazy: loadContentRoute,
           handle: { page: `page:${page.slug}`, title: page.title, description: page.description },
         })),
       {

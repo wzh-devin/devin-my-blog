@@ -21,6 +21,8 @@ export type Article = {
   headingList: { id: string; title: string; level: number }[];
 };
 
+export type ArticleSummary = Omit<Article, 'nodeList' | 'headingList'>;
+
 export type FeaturedArticle = { slug: string; shortTitle: string };
 export type Category = string;
 
