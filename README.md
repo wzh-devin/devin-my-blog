@@ -409,12 +409,14 @@ Prettier 配置在 `.prettierrc.json`，Oxlint 配置在 `.oxlintrc.json`。Pret
 
 网站与内容分别发布：
 
-| 仓库               | main 推送时执行                            | 服务器变化                            |
+| 仓库               | 发布触发与执行                             | 服务器变化                            |
 | ------------------ | ------------------------------------------ | ------------------------------------- |
-| devin-my-blog      | 检查并构建网站程序，打包 Docker 镜像       | Compose 更新网站容器；保留内容目录    |
+| devin-my-blog      | 推送 `vX.Y.Z` Tag，构建镜像并推送 GHCR     | Compose 更新网站容器；保留内容目录    |
 | devin-blog-content | 校验文章、配置、页面，生成 JSON 与摘要资源 | 只更新 content/；不构建网站或重启容器 |
 
-网站工作流为 [.github/workflows/deploy.yml](.github/workflows/deploy.yml)。内容工作流为内容仓库的 `.github/workflows/publish.yml`。手动运行默认 `deploy=false`，只生成产物；明确勾选才发布。内容发布不触发网站工作流，不需要 `CONTENT_READ_TOKEN` 或 `SITE_DISPATCH_TOKEN`。
+网站工作流为 [.github/workflows/deploy.yml](.github/workflows/deploy.yml)，只在推送版本 Tag 时自动发布，推送 main 不发布。镜像推送到 `ghcr.io/wzh-devin/devin-my-blog:vX.Y.Z`，关联本仓库的 **Packages**；Actions 使用内置 `GITHUB_TOKEN` 和 `packages: write` 权限，无需新增 PAT。首次发布的 Package 默认私有，可按需要在 Package 设置中调整可见性。
+
+内容工作流为内容仓库的 `.github/workflows/publish.yml`。手动运行默认 `deploy=false`，只生成产物；明确勾选才发布。网站手动运行同样必须选择版本 Tag，默认不推送 GHCR 或部署。内容发布不触发网站工作流，不需要 `CONTENT_READ_TOKEN` 或 `SITE_DISPATCH_TOKEN`。
 
 ### 源码、镜像与内容目录
 
@@ -439,7 +441,7 @@ Nginx Proxy Manager 继续负责域名与 HTTPS，代理到独立静态容器；
 ```dotenv
 BLOG_BIND_ADDRESS=127.0.0.1
 BLOG_HTTP_PORT=16001
-BLOG_IMAGE=devin-my-blog:v0.1.1 # 由网站发布脚本写入，与 package.json 版本一致
+BLOG_IMAGE=devin-my-blog:v0.1.1 # 由网站发布脚本写入，与推送的 Git Tag 一致
 ```
 
 默认只监听回环地址；NPM 在容器中运行时，应填写 NPM 能访问的主机私网地址，与已有上游规则保持一致。实际连接参数存 GitHub Variables 和服务器环境文件。不要直接把 /root 目录开放给部署用户；上传和 Docker 操作使用既有 `sudo -n` 权限。静态容器只挂载本项目内容目录。
@@ -472,12 +474,23 @@ BLOG_IMAGE=devin-my-blog:v0.1.1 # 由网站发布脚本写入，与 package.json
 1. 审查网站与内容仓库的完整改动；网站开发分支为 dev，启用需经审查合并到 main。不要只上传工作流而遗漏解析器、运行时读取、Dockerfile 和 Compose。
 2. 配置上面的 Variables/Secret。服务器需已有 Docker、Compose、rsync、经确认的 SSH 主机身份，以及部署账号的既有非交互 sudo 权限。
 3. 内容 Actions **Publish blog content** 默认只生成 `blog-content` 产物；确认后勾选 deploy 发布首份内容。
-4. 网站 Actions **Build and deploy website** 默认只生成 `blog-website-image`；确认后勾选 deploy。镜像由 runner 构建后打包上传，服务器只加载镜像并运行 Compose，不在小内存服务器安装 Node 或执行 npm 构建。
-5. 检查首页、文章直达、代码复制、图表和 `/content/index.json` 缓存头。以后文章/配置变化只推送内容仓库；前端代码变化只推送网站仓库。
+4. 网站代码合并到 main 后，手动创建并推送 `vX.Y.Z` Tag，自动发布镜像并部署。手动验收可执行 `gh workflow run deploy.yml --ref vX.Y.Z`，只生成 `blog-website-image`；加 `-F deploy=true` 才推送 GHCR 并部署。镜像只构建一次，同时标记 GHCR 名和服务器本地名；GHCR 推送成功后才交付部署产物，服务器加载同一镜像并运行 Compose，无需镜像仓库凭据或 Node 构建环境。
+5. 检查仓库 Packages 中的版本、首页、文章直达、代码复制、图表和 `/content/index.json` 缓存头。以后文章/配置变化只推送内容仓库；网站代码合并 main 后再推送新版本 Tag。
 
-镜像标签统一使用 `vX.Y.Z`，唯一版本来源为 `package.json` 的 `version`，例如 `0.1.1` 对应 `devin-my-blog:v0.1.1`。每次网站发版先递增版本（例如 `npm version patch --no-git-tag-version`，同时更新 package-lock.json），再提交网站代码；该命令不会创建 Git 提交或 Git 标签。构建和部署都会校验格式，拒绝日期、提交 SHA、latest、预发布后缀及多余前导零。镜像的 `org.opencontainers.image.revision` 标签记录 Actions 构建的提交 SHA，用于核对实际部署来源。文章和配置更新不需要改网站版本。
+发布版本完全由手动推送的 Git Tag 决定，镜像标签原样使用该 `vX.Y.Z` Tag。`package.json` 的 `version` 不参与发布版本校验，工作流不检查提交的 main 归属；只检查 Tag 为正式的 `vX.Y.Z` 格式，拒绝日期、提交 SHA、latest、预发布后缀及多余前导零。镜像的 OCI source、version、revision 标签记录关联仓库、版本与构建提交。文章和配置更新不需要改网站版本。
 
-网站 Dockerfile 使用预先生成的 dist：本地先 `npm run build`，再 `docker build -t "devin-my-blog:v$(node -p "require('./package.json').version")" .`。本地开发或预览直接使用 npm 命令；生产只由 Compose 运行镜像。
+例如将 main 上的提交发布为 `v0.1.3`：
+
+```bash
+git switch main
+git pull --ff-only origin main
+git tag v0.1.3
+git push origin v0.1.3
+```
+
+推送后生成 `ghcr.io/wzh-devin/devin-my-blog:v0.1.3`，部署使用同一镜像的 `devin-my-blog:v0.1.3` 本地标签。只创建本地 Tag 不会触发 Actions；无需另外创建 GitHub Release，也不要覆盖已发布的版本 Tag。
+
+网站 Dockerfile 使用预先生成的 dist：本地先 `npm run build`，再按所选 Git Tag 构建，例如 `docker build -t devin-my-blog:v0.1.3 .`。本地开发或预览直接使用 npm 命令；生产只由 Compose 运行镜像。
 
 ### 发布保障和边界
 

@@ -2,7 +2,7 @@ name: Build and deploy website
 
 on:
   push:
-    branches: [main]
+    tags: ['v*.*.*']
   workflow_dispatch:
     inputs:
       deploy:
@@ -21,6 +21,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image: ${{ steps.image.outputs.image }}
     steps:
@@ -31,17 +34,18 @@ jobs:
         with:
           node-version: '22.22.0'
           cache: npm
-      - name: Set semantic image tag
+      - name: Validate release tag
         id: image
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
-          import { appendFileSync, readFileSync } from 'node:fs';
-          const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
-          if (typeof version !== 'string' || version.trim() !== version || !/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(version)) {
-            throw new Error('package.json version must be X.Y.Z');
+          import { appendFileSync } from 'node:fs';
+          const tag = process.env.GITHUB_REF_NAME;
+          if (process.env.GITHUB_REF_TYPE !== 'tag' || typeof tag !== 'string' || tag.trim() !== tag || !/^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(tag)) {
+            throw new Error('Push or select a release tag in vX.Y.Z format');
           }
-          appendFileSync(process.env.GITHUB_OUTPUT, `image=devin-my-blog:v${version}\n`);
+          const repository = process.env.GITHUB_REPOSITORY.toLowerCase();
+          appendFileSync(process.env.GITHUB_OUTPUT, `image=devin-my-blog:${tag}\nregistry_image=ghcr.io/${repository}:${tag}\n`);
           NODE
       - run: npm ci
       - run: npm run format:check && npm run lint
@@ -49,12 +53,25 @@ jobs:
       - name: Package website image
         env:
           BLOG_IMAGE: ${{ steps.image.outputs.image }}
+          REGISTRY_IMAGE: ${{ steps.image.outputs.registry_image }}
         run: |
           set -euo pipefail
           mkdir -p deployment
-          docker build --tag "$BLOG_IMAGE" --label "org.opencontainers.image.revision=$GITHUB_SHA" .
+          docker build --tag "$BLOG_IMAGE" --tag "$REGISTRY_IMAGE" \
+            --label "org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.version=$GITHUB_REF_NAME" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" .
           docker save "$BLOG_IMAGE" | gzip > deployment/image.tar.gz
           cp compose.yaml deployment/compose.yaml
+      - name: Publish image to GitHub Packages
+        if: github.event_name != 'workflow_dispatch' || inputs.deploy
+        env:
+          REGISTRY_IMAGE: ${{ steps.image.outputs.registry_image }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          docker push "$REGISTRY_IMAGE"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: blog-website-image
